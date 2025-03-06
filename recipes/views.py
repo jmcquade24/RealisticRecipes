@@ -2,7 +2,6 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import login_required
 from .models import Recipe
 from django.contrib.auth.models import User
 from .models import Recipe, Review, Category, Like
@@ -15,7 +14,11 @@ def index(request):
 def home(request):
     return render(request, 'recipes.home.html')
 
-def signup(request):
+def about(request):
+    return render(request, 'recipes.about.html')
+
+    
+def register(request):
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
@@ -23,7 +26,7 @@ def signup(request):
         user = User.objects.create_user(username=username, email=email, password=password)
         login(request, user)
         return redirect('home')
-    return render(request, 'signup.html')
+    return render(request, 'register.html')
 
 def user_login(request):
     if request.method == "POST":
