@@ -4,3 +4,5 @@ from django.contrib.auth.models import login_required
 from .models import Recipe
 
 # Create your views here.
+def index(request):
+    return render(request, 'rango.index.html')
