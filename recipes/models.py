@@ -42,7 +42,7 @@ class Review(models.Model):
 
 
 class Like(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='likes')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='recipe_likes')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
