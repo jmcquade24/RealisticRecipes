@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .models import Recipe, Review, Category, Like
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 # Create your views here.
 def index(request):
@@ -92,6 +93,7 @@ def view_categories(request):
     return render(request, 'recipes/categories.html', {'categories': categories})
 
 
+@require_POST
 @login_required
 def like_recipe(request, recipe_id):
     try:
@@ -136,3 +138,11 @@ def add_review(request, recipe_id):
 def popular_recipes(request):
     popular = Recipe.objects.order_by('-likes')[:10]
     return render(request, 'recipes/popular.html', {'popular': popular})
+
+def view_categories(request):
+    categories = Category.objects.all()
+    return render(request, 'categories.html', {'categories': categories})
+
+def popular_recipes(request):
+    popular = Recipe.objects.order_by('-likes')[-10]
+    return render(request, 'popular.html', {'popular' : popular})

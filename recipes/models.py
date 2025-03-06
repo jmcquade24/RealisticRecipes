@@ -42,9 +42,18 @@ class Review(models.Model):
 
 
 class Like(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='likes')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='recipe_likes')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Like by {self.user.username} on {self.recipe.title}"
+    
+    
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    bio = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.user.username

@@ -1,0 +1,24 @@
+{
+  "name": "realisticrecipes",
+  "version": "1.0.0",
+  "description": "recipe website",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmcquade24/RealisticRecipes.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jmcquade24/RealisticRecipes/issues"
+  },
+  "homepage": "https://github.com/jmcquade24/RealisticRecipes#readme",
+  "dependencies": {
+    "express": "^4.21.2",
+    "jest": "^29.7.0"
+  }
+}
