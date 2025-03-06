@@ -16,34 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls import include
-from rango import views
+from recipes import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('rango/', include('rango.urls')),
+    path('recipes/', include('recipes.urls')),
     path('admin/', admin.site.urls),
-    path('', include('rango.urls')),
+    path('', include('recipes.urls')),
 
-    # User Authentication
-    path('signup/', views.signup, name='signup'),
-    path('login/', views.user_login, name='login'),
-    path('logout/', views.user_logout, name='logout'),
-    path('delete_account/', views.delete_account, name='delete_account'),
-
-    # Recipes
-    path('recipes/create/', views.create_recipe, name='create_recipe'),
-    path('recipes/<int:recipe_id>/', views.view_recipe, name='view_recipe'),
-    path('recipes/<int:recipe_id>/delete/', views.delete_recipe, name='delete_recipe'),
-
-    # Categories
-    path('categories/', views.view_categories, name='view_categories'),
-
-    # User Interactions
-    path('recipes/<int:recipe_id>/like/', views.like_recipe, name='like_recipe'),
-    path('recipes/<int:recipe_id>/favorite/', views.favorite_recipe, name='favorite_recipe'),
-    path('recipes/<int:recipe_id>/review/', views.add_review, name='add_review'),
-    path('favorites/', views.view_favorites, name='view_favorites'),
-
-    # Popular Page
-    path('popular/', views.popular_recipes, name='popular_recipes'),
-]
+    ]
