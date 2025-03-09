@@ -146,3 +146,11 @@ def view_categories(request):
 def popular_recipes(request):
     popular = Recipe.objects.order_by('-likes')[-10]
     return render(request, 'popular.html', {'popular' : popular})
+
+def homepage(request):
+    featured_recipes = Recipe.objects.filter(is_featured=True)[:3]  # Get the top 3 featured recipes
+    top_categories = Category.objects.all()[:3]  # Get the top 3 categories
+    return render(request, 'homepage.html', {
+        'featured_recipes': featured_recipes,
+        'top_categories': top_categories
+    })

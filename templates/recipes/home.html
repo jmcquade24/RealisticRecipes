@@ -3,16 +3,17 @@
 {% block content %}
 <h2>Welcome to the Realistic Recipes</h2>
 <p>Discover new recipes and share your own!</p>
-{% endblock %}
+
 <div class="container">
     <div class="featured">
         <h2>Featured Recipes</h2>
         <div class="recipe-list">
             {% for recipe in featured_recipes %}
             <div class="recipe-card">
-                <img src="{{ recipe.image_url }}" alt="{{ recipe.name }}">
-                <h3>{{ recipe.name }}</h3>
+                <img src="{{ recipe.image_url }}" alt="{{ recipe.title }}">
+                <h3>{{ recipe.title }}</h3>
                 <p>{{ recipe.description }}</p>
+                <a href="{% url 'recipes:view_recipe' recipe.id %}">View Recipe</a>
             </div>
             {% endfor %}
         </div>
@@ -22,9 +23,9 @@
         <h2>Top Categories</h2>
         <ul>
             {% for category in top_categories %}
-            <li><a href="{% url 'category_recipes' category.id %}">{{ category.name }}</a></li>
+            <li><a href="{% url 'recipes:view_category' category.id %}">{{ category.name }}</a></li>
             {% endfor %}
         </ul>
     </div>
 </div>
-
+{% endblock %}

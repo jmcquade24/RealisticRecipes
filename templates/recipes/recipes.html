@@ -1,10 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Recipes{% endblock %}
+{% block title %}Recipes Page{% endblock %}
 {% block content %}
 <h2>Recipes</h2>
 <ul>
     {% for recipe in recipes %}
-        <li>{{ recipe.name }} - <a href="{% url 'view_recipe' recipe.id %}">View</a></li>
+        <li>{{ recipe.name }} - <a href="{% url 'recipes:view_recipe' recipe.id %}">View</a></li>
+    {% empty %}
+        <p>No recipes available.</p>
     {% endfor %}
 </ul>
 <h3>Add a Recipe</h3>

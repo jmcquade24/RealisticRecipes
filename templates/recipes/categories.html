@@ -1,12 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Categories{% endblock %}
+{% block title %}Categories Page{% endblock %}
 {% block content %}
-<h2>Recipe Categories</h2>
+<h2>Categories Page</h2>
 <section>
     <h3>Popular Recipes</h3>
     <ul>
         {% for recipe in popular_recipes %}
-            <li>{{ recipe.name }}</li>
+            <li>{{ recipe.name }} - <a href="{% url 'recipes:view_recipe' recipe.id %}">View</a></li>
+        {% empty %}
+            <p>No popular recipes available.</p>
         {% endfor %}
     </ul>
 </section>
@@ -14,7 +16,9 @@
     <h3>New Recipes</h3>
     <ul>
         {% for recipe in new_recipes %}
-            <li>{{ recipe.name }}</li>
+            <li>{{ recipe.name }} - <a href="{% url 'recipes:view_recipe' recipe.id %}">View</a></li>
+        {% empty %}
+            <p>No new recipes available.</p>
         {% endfor %}
     </ul>
 </section>
