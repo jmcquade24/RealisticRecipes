@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Categories{% endblock %}
+{% block content %}
+<h2>Recipe Categories</h2>
+<section>
+    <h3>Popular Recipes</h3>
+    <ul>
+        {% for recipe in popular_recipes %}
+            <li>{{ recipe.name }}</li>
+        {% endfor %}
+    </ul>
+</section>
+<section>
+    <h3>New Recipes</h3>
+    <ul>
+        {% for recipe in new_recipes %}
+            <li>{{ recipe.name }}</li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}
+

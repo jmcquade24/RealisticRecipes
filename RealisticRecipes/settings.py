@@ -38,7 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
     'recipes',
+=======
+    'rango'
+>>>>>>> 41ec93a ( templates and css)
 ]
 
 MIDDLEWARE = [
