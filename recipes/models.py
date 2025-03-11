@@ -34,7 +34,7 @@ class Recipe(models.Model):
 class Review(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    rating = models.IntegerField()
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])    
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 

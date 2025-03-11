@@ -6,7 +6,8 @@ from django.contrib.auth.models import User
 from .models import Recipe, Review, Category, Like
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from .forms import UserProfileForm
+from .forms import SignUpForm, RecipeForm, ReviewForm
+from django.db import models
 
 # Create your views here.
 def about(request):
@@ -14,29 +15,26 @@ def about(request):
     
 def register(request):
     if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
-        email = request.POST['email']
+        form = SignUpForm(request.POST)
 
-        if User.objects.filter(email=email).exists():
-            return render(request, 'recipes/register.html', {'error': 'Email already exists'})
-
-        user = User.objects.create_user(username=username, email=email, password=password)
-        login(request, user)
-        return redirect('index')
-    return render(request, 'recipes/register.html')
-
-def user_login(request):
-    if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user:
+        if form.is_valid():
+            user = form.save() 
             login(request, user)
             return redirect('index')
         else:
-            return render(request, 'recipes/login.html', {'error': 'Invalid credentials'})
-    return render(request, 'recipes/login.html')
+            form = SignUpForm()
+    return render(request, 'recipes/register.html', {'form' : form})
+
+def user_login(request):
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('index')
+        else:
+            form = AuthenticationForm()
+        return render(request, 'recipes/login.html', {'form' : form})
 
 @login_required
 def recipes(request):
@@ -72,7 +70,12 @@ def create_recipe(request):
 def view_recipe(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)
     reviews = Review.objects.filter(recipe=recipe)
-    return render(request, 'recipes/view_recipe.html', {'recipe': recipe, 'reviews': reviews})
+    
+    paginator = Paginator(reviews, 5)  # Show 5 reviews per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'recipes/view_recipe.html', {'recipe': recipe, 'reviews': page_obj})
 
 @login_required
 def delete_recipe(request, recipe_id):
@@ -122,12 +125,18 @@ def view_favorites(request):
 
 @login_required
 def add_review(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id = recipe_id)
     if request.method == "POST":
-        rating = request.POST['rating']
-        comment = request.POST['comment']
-        recipe = get_object_or_404(Recipe, id=recipe_id)
-        Review.objects.create(recipe=recipe, user=request.user, rating=rating, comment=comment)
-    return redirect('recipes:view_recipe', recipe_id=recipe_id)
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.recipe = recipe
+            review.user = request.user
+            review.save()
+            return redirect('view_recipe', recipe_id=recipe_id)
+        else:
+            form = ReviewForm()
+    return redirect(request, 'add_review.html', {'form' : form, 'recipe' : recipe})
 
 def popular_recipes(request):
     popular = Recipe.objects.order_by('-likes')[:10]
