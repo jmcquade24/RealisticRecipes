@@ -21,8 +21,8 @@ def register(request):
             user = form.save() 
             login(request, user)
             return redirect('index')
-        else:
-            form = SignUpForm()
+    else:
+        form = SignUpForm()
     return render(request, 'recipes/register.html', {'form' : form})
 
 def user_login(request):
