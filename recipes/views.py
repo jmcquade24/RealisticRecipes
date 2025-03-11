@@ -137,7 +137,7 @@ def view_categories(request):
     categories = Category.objects.all()
     return render(request, 'recipes/categories.html', {'categories': categories})
 
-def home(request):
+def index(request):
     featured_recipes = Recipe.objects.filter(is_featured=True)[:3]  # Get the top 3 featured recipes
     top_categories = Category.objects.all()[:3]  # Get the top 3 categories
     return render(request, 'recipes/home.html', {
