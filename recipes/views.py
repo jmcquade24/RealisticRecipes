@@ -36,7 +36,6 @@ def user_login(request):
             form = AuthenticationForm()
         return render(request, 'recipes/login.html', {'form' : form})
 
-@login_required
 def recipes(request):
     return render(request, 'recipes/recipes.html')
 
