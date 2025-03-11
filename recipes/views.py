@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from .models import Recipe, Review, Category, Like
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from .forms import UserProfileForm
 
 # Create your views here.
 def about(request):
@@ -56,23 +57,18 @@ def delete_account(request):
 @login_required
 def create_recipe(request):
     if request.method == 'POST':
-        title = request.POST['title']
-        description = request.POST['description']
-
-        if not title or not description:
-            return render(request, 'recipes/create_recipe.html', {'categories': Category.objects.all(), 'error': 'Title and description are required'})
-
-        try:
-            category = Category.objects.get(id=request.POST['category'])
-        except Category.DoesNotExist:
-            return render(request, 'recipes/create_recipe.html', {'categories': Category.objects.all(), 'error': 'Invalid category selected'})  
-        
-        recipe = Recipe.objects.create(title=title, description=description, category=category, author=request.user)   
-        return redirect('recipes:view_recipe', recipe_id=recipe.id) 
+        form = RecipeForm(request.POST, request.FILES)
+        if form.is_valid():
+            recipe = form.save(commit=False)
+            recipe.author = request.user  
+            recipe.save()
+            return redirect('view_recipe', recipe_id=recipe.id)
+    else:
+        form = RecipeForm()
+    
     categories = Category.objects.all()
-    return render(request, 'recipes/create_recipe.html', {'categories': categories})
+    return render(request, 'create_recipe.html', {'form': form, 'categories': categories})
 
-@login_required
 def view_recipe(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)
     reviews = Review.objects.filter(recipe=recipe)
@@ -148,3 +144,56 @@ def home(request):
         'featured_recipes': featured_recipes,
         'top_categories': top_categories
     })
+
+
+@login_required
+def edit_recipe(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    if request.user != recipe.author:
+        return redirect('home')
+    
+    if request.method == 'POST':
+        form = RecipeForm(request.POST, instance=recipe)
+        if form.is_valid():
+            form.save()
+            return redirect('view_recipe', recipe_id=recipe.id)
+    else:
+        form = RecipeForm(instance=recipe)
+    
+    return render(request, 'edit_recipe.html', {'form': form})
+
+def user_profile(request, username):
+    user = get_object_or_404(User, username=username)
+    recipes = Recipe.objects.filter(author=user)
+    liked_recipes = user.liked_recipes.all()
+    return render(request, 'user_profile.html', {
+        'profile_user': user,
+        'recipes': recipes,
+        'liked_recipes': liked_recipes
+    })
+    
+def search_recipes(request):
+    query = request.GET.get('q')
+    if query:
+        recipes = Recipe.objects.filter(
+            models.Q(title__icontains=query) |
+            models.Q(ingredients__icontains=query) |
+            models.Q(tags__name__icontains=query)
+        ).distinct()
+    else:
+        recipes = Recipe.objects.none()
+    
+    return render(request, 'search_results.html', {'recipes': recipes, 'query': query})
+
+@login_required
+def manage_account(request):
+    user_profile = request.user.userprofile
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('user_profile', username=request.user.username)
+    else:
+        form = UserProfileForm(instance=request.user_profile)
+    
+    return render(request, 'manage_account.html', {'form': form})

@@ -19,7 +19,8 @@ from django.urls import include
 from recipes import views
 
 urlpatterns = [
-    path('', views.home, name='home'),
+    path('', views.index, name='index'),
+    path('recipes/', include('recipes.urls')),
     path('admin/', admin.site.urls),
 
     # Include recipes app URLs
