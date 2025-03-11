@@ -8,12 +8,6 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
 # Create your views here.
-def index(request):
-    return render(request, 'recipes/index.html')
-
-def home(request):
-    return render(request, 'recipes/home.html')
-
 def about(request):
     return render(request, 'recipes/about.html')
     
@@ -42,6 +36,10 @@ def user_login(request):
         else:
             return render(request, 'recipes/login.html', {'error': 'Invalid credentials'})
     return render(request, 'recipes/login.html')
+
+@login_required
+def recipes(request):
+    return render(request, 'recipes/recipes.html')
 
 @login_required
 def user_logout(request):
@@ -141,16 +139,12 @@ def popular_recipes(request):
 
 def view_categories(request):
     categories = Category.objects.all()
-    return render(request, 'categories.html', {'categories': categories})
+    return render(request, 'recipes/categories.html', {'categories': categories})
 
-def popular_recipes(request):
-    popular = Recipe.objects.order_by('-likes')[-10]
-    return render(request, 'popular.html', {'popular' : popular})
-
-def homepage(request):
+def home(request):
     featured_recipes = Recipe.objects.filter(is_featured=True)[:3]  # Get the top 3 featured recipes
     top_categories = Category.objects.all()[:3]  # Get the top 3 categories
-    return render(request, 'homepage.html', {
+    return render(request, 'recipes/home.html', {
         'featured_recipes': featured_recipes,
         'top_categories': top_categories
     })

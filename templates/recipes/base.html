@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+
+{% load staticfiles %}
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,16 +15,16 @@
         <nav>
             <ul>
                 <li><a href="{% url 'home' %}">Home</a></li>
-                <li><a href="{% url 'about' %}">About</a></li>
-                <li><a href="{% url 'categories' %}">Categories</a></li>
-                <li><a href="{% url 'recipes' %}">Recipes</a></li>
+                <li><a href="{% url 'recipes:about' %}">About</a></li>
+                <li><a href="{% url 'recipes:view_categories' %}">Categories</a></li>
+                <li><a href="{% url 'recipes:recipes' %}">Recipes</a></li>
             </ul>
         </nav>
     </header>
 
     <main>
         {% block content %}{% endblock %}
-        {% include 'navbar.html' %}
+        {% include 'recipes/navbar.html' %}
     </main>
 
     <footer>

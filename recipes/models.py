@@ -19,6 +19,7 @@ class Recipe(models.Model):
     prep_time = models.PositiveIntegerField()
     cook_time = models.PositiveIntegerField()
     servings = models.PositiveIntegerField()
+    is_featured = models.BooleanField(default=False)
     image = models.ImageField(upload_to='recipes/', blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)

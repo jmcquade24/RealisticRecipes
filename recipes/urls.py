@@ -4,13 +4,14 @@ from recipes import views
 app_name = 'recipes'
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.home, name='home'),
     path('about/', views.about, name='about'), 
     path('register/', views.register, name='register'),  
     path('login/', views.user_login, name='login'),  
     path('logout/', views.user_logout, name='logout'), 
 
     # Recipe management
+    path('recipes/', views.recipes, name='recipes'),
     path('create/', views.create_recipe, name='create_recipe'),
     path('<int:recipe_id>/', views.view_recipe, name='view_recipe'),
     path('<int:recipe_id>/delete/', views.delete_recipe, name='delete_recipe'),
