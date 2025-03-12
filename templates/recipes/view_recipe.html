@@ -1,21 +1,58 @@
-<button id="like-btn" data-slug="{{ recipe.slug }}">&#128077; Like (<span id="like-count">{{ recipe.likes }}</span>)</button>
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ recipe.title }}</h1>
+<p><strong>Author:</strong> {{ recipe.author.username }}</p>
+<p><strong>Description:</strong> {{ recipe.description }}</p>
+<p><strong>Ingredients:</strong> {{ recipe.ingredients }}</p>
+<p><strong>Instructions:</strong> {{ recipe.instructions }}</p>
+
+<!-- Like Button -->
+<button id="like-btn" data-slug="{{ recipe.slug }}">
+    &#128077; Like (<span id="like-count">{{ recipe.likes }}</span>)
+</button>
+
+<!-- Favorite Button -->
+<button id="favorite-btn" data-slug="{{ recipe.slug }}">
+    &#10084; Favorite (<span id="favorite-status">
+    {% if user in recipe.favorites.all %}Added{% else %}Add{% endif %}
+    </span>)
+</button>
+
+<!-- Reviews Section -->
+<h3>Reviews</h3>
+<ul id="reviews">
+    {% for review in recipe.review_set.all %}
+        <li><strong>{{ review.user.username }}</strong>: ({{ review.rating }}/5) - {{ review.comment }}</li>
+    {% empty %}
+        <li>No reviews yet. Be the first to review!</li>
+    {% endfor %}
+</ul>
+
+<!-- Add Review Form -->
+{% if user.is_authenticated %}
+<form id="review-form">
+    {% csrf_token %}
+    <input type="number" name="rating" id="rating" min="1" max="5" required>
+    <textarea name="comment" id="comment" required></textarea>
+    <button type="submit">Submit Review</button>
+</form>
+{% else %}
+<p><a href="{% url 'accounts:login' %}">Log in</a> to leave a review.</p>
+{% endif %}
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+    // Like Button Functionality
     const likeButton = document.getElementById("like-btn");
-
     likeButton.addEventListener("click", function () {
         const recipeSlug = likeButton.getAttribute("data-slug");
         const likeCountElement = document.getElementById("like-count");
 
-        // Disable button to prevent multiple clicks
-        likeButton.disabled = true;
-
         fetch(`/recipe/${recipeSlug}/like/`, {
             method: "POST",
             headers: {
-                "X-Requested-With": "XMLHttpRequest",  // Identifies AJAX request
-                "X-CSRFToken": getCSRFToken(),          // CSRF token for security
+                "X-CSRFToken": getCSRFToken(),
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({})
@@ -23,26 +60,68 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
             likeCountElement.textContent = data.likes;
-            likeButton.disabled = false;  // Re-enable button after response
         })
-        .catch(error => {
-            console.error("Error liking recipe:", error);
-            likeButton.disabled = false;
-        });
+        .catch(error => console.error("Error liking recipe:", error));
     });
 
-    // Function to retrieve CSRF token from cookies (for Django)
+    // Favorite Button Functionality
+    const favoriteButton = document.getElementById("favorite-btn");
+    favoriteButton.addEventListener("click", function () {
+        const recipeSlug = favoriteButton.getAttribute("data-slug");
+        const favoriteStatus = document.getElementById("favorite-status");
+
+        fetch(`/recipe/${recipeSlug}/favorite/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken(),
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            favoriteStatus.textContent = data.favorited ? "Added" : "Add";
+        })
+        .catch(error => console.error("Error favoriting recipe:", error));
+    });
+
+    // Add Review Form Submission (AJAX)
+    const reviewForm = document.getElementById("review-form");
+    if (reviewForm) {
+        reviewForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const recipeSlug = "{{ recipe.slug }}";
+
+            fetch(`/recipe/${recipeSlug}/review/`, {
+                method: "POST",
+                headers: { "X-CSRFToken": getCSRFToken() },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const reviewsList = document.getElementById("reviews");
+                const newReview = document.createElement("li");
+                newReview.innerHTML = `<strong>${data.username}</strong>: (${data.rating}/5) - ${data.comment}`;
+                reviewsList.appendChild(newReview);
+                reviewForm.reset();
+            })
+            .catch(error => console.error("Error submitting review:", error));
+        });
+    }
+
+    // CSRF Token Function
     function getCSRFToken() {
         let cookieValue = null;
-        const cookies = document.cookie.split(";");
-        for (let cookie of cookies) {
-            const [name, value] = cookie.trim().split("=");
+        document.cookie.split(";").forEach(cookie => {
+            let [name, value] = cookie.trim().split("=");
             if (name === "csrftoken") {
                 cookieValue = decodeURIComponent(value);
-                break;
             }
-        }
+        });
         return cookieValue;
     }
 });
 </script>
+
+{% endblock %}
