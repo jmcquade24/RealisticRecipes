@@ -7,7 +7,7 @@ __pycache__/
 *.so
 
 # media files
-recipe_pictures/*
+recipes_pictures/*
 
 # migrations
 recipes/migrations/*
