@@ -6,6 +6,12 @@ __pycache__/
 # C extensions
 *.so
 
+# media files
+recipe_pictures/*
+
+# migrations
+recipes/migrations/*
+
 # Distribution / packaging
 .Python
 build/

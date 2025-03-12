@@ -148,7 +148,7 @@ def view_categories(request):
 def index(request):
     featured_recipes = Recipe.objects.filter(is_featured=True)[:3]  # Get the top 3 featured recipes
     top_categories = Category.objects.all()[:3]  # Get the top 3 categories
-    return render(request, 'recipes/home.html', {
+    return render(request, 'recipes/home.html', context={
         'featured_recipes': featured_recipes,
         'top_categories': top_categories
     })
