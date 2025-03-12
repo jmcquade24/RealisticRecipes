@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from .models import Recipe, Review, Category, Like
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 def index(request):
@@ -74,39 +75,26 @@ def create_recipe(request):
     categories = Category.objects.all()
     return render(request, 'recipes/create_recipe.html', {'categories': categories})
 
-@login_required
-def view_recipe(request, recipe_id):
-    recipe = get_object_or_404(Recipe, id=recipe_id)
-    reviews = Review.objects.filter(recipe=recipe)
-    return render(request, 'recipes/view_recipe.html', {'recipe': recipe, 'reviews': reviews})
+def view_recipe(request, slug):
+    recipe = get_object_or_404(Recipe, slug=slug)
+    return render(request, "recipes/view_recipe.html", {"recipe": recipe})
 
-@login_required
-def delete_recipe(request, recipe_id):
-    recipe = get_object_or_404(Recipe, id=recipe_id)
-    if request.user != recipe.author:
-        return HttpResponse("You are not allowed to delete this recipe.", status=403)
+def delete_recipe(request, slug):
+    recipe = get_object_or_404(Recipe, slug=slug)
     recipe.delete()
-    return redirect('index')
+    return redirect("recipes:index")
 
 def view_categories(request):
     categories = Category.objects.filter(recipe__isnull=False).distinct()
     return render(request, 'recipes/categories.html', {'categories': categories})
 
 
-@require_POST
-@login_required
-def like_recipe(request, recipe_id):
-    try:
-        recipe = get_object_or_404(Recipe, id=recipe_id)
-        if request.user in recipe.likes.all():
-            recipe.likes.remove(request.user)
-            liked = False
-        else:
-            recipe.likes.add(request.user)
-            liked = True
-        return JsonResponse({'liked': liked, 'total_likes': recipe.likes.count()})
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+@csrf_exempt
+def like_recipe(request, slug):
+    recipe = get_object_or_404(Recipe, slug=slug)
+    recipe.likes += 1
+    recipe.save()
+    return JsonResponse({"likes": recipe.likes})
 
 
 @login_required

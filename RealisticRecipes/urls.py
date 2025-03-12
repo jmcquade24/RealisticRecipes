@@ -17,17 +17,21 @@ from django.contrib import admin
 from django.urls import path
 from django.urls import include
 from recipes import views
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('', views.index, name='index'),
     path('admin/', admin.site.urls),
-
-    # Include recipes app URLs
     path('recipes/', include('recipes.urls')),
-
-    # User Authentication
-    path('signup', views.register, name='singup'),
-    path('login', views.user_login, name='login'),
-    path('logout', views.user_logout, name='logout'),
-    path('delete_account', views.delete_account, name='delete_account'),
+    path("accounts/signup/", views.register, name="signup"), 
+    path("accounts/login/", views.user_login, name="login"),
+    path("accounts/logout/", views.user_logout, name="logout"),
+    path("accounts/delete/", views.delete_account, name="delete_account"),
 ]
+
+handler404 = "recipes.views.custom_404"
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
