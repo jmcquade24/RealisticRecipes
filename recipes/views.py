@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from .forms import SignUpForm, RecipeForm, ReviewForm, AuthenticationForm
 from django.db import models
+from django.core.paginator import Paginator
 
 # Create your views here.
 def about(request):
