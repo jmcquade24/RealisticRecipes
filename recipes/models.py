@@ -20,7 +20,7 @@ class Recipe(models.Model):
     cook_time = models.PositiveIntegerField()
     servings = models.PositiveIntegerField()
     is_featured = models.BooleanField(default=False)
-    image = models.ImageField(upload_to='recipes/', blank=True, null=True)
+    image = models.ImageField(upload_to='recipes_pictures', blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -53,7 +53,7 @@ class Like(models.Model):
     
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pics', blank=True, null=True)
     bio = models.TextField(blank=True)
 
     def __str__(self):
