@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from .models import Recipe, Review, Category, Like
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from .forms import SignUpForm, RecipeForm, ReviewForm
+from .forms import SignUpForm, RecipeForm, ReviewForm, AuthenticationForm
 from django.db import models
 
 # Create your views here.
@@ -35,6 +35,8 @@ def user_login(request):
         else:
             form = AuthenticationForm()
         return render(request, 'recipes/login.html', {'form' : form})
+    else:
+        return render(request, 'recipes/login.html')
 
 def recipes(request):
     return render(request, 'recipes/recipes.html')

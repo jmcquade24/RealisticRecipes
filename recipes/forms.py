@@ -31,6 +31,9 @@ class SignUpForm(UserCreationForm):
             user.save()
         return user
 
+class AuthenticationForm(forms.ModelForm):
+    pass
+
 class ReviewForm(forms.ModelForm):
     RATING_CHOICES = [
         (1, '1 - Poor'),
