@@ -21,6 +21,13 @@ def about(request):
 # User Authentication
 def register(request):
     if request.method == "POST":
+    
+        username = request.POST["username"]
+        password = request.POST["password"]
+        user = User.objects.create_user(username=username, password=password)
+        return redirect("login")
+    else:
+        return render(request, "recipes/register.html")
 
 def user_login(request):
     if request.method == "POST":
@@ -32,8 +39,10 @@ def user_login(request):
             return redirect("index")
         else:
             return render(request, "recipes/login.html", {"error": "Invalid credentials"})
-    
-    return render(request, "recipes/login.html")
+    else:
+        return render(request, "recipes/login.html")
+
+
 
 
 @login_required
@@ -119,7 +128,7 @@ def view_favorites(request):
 # Categories
 def view_categories(request):
     categories = Category.objects.all()
-    return render(request, 'recipes/categories.html', {'categories': categories}))
+    return render(request, 'recipes/categories.html', {'categories': categories})
 
 # Popular Recipes
 def popular_recipes(request):
