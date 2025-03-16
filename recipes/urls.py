@@ -7,8 +7,12 @@ urlpatterns = [
     # Core pages
     path("", views.index, name="index"),
     path("about/", views.about, name="about"),
+    path("register", views.register, name="register"),  
+    path("login/", views.user_login, name="login"),  
+    path("logout/", views.user_logout, name="logout"), 
 
     # Recipe Management
+    path("recipes/", views.recipes, name="recipes"),
     path("create/", views.create_recipe, name="create_recipe"),
     path("recipe/<slug:slug>/", views.view_recipe, name="view_recipe"),
     path("recipe/<slug:slug>/delete/", views.delete_recipe, name="delete_recipe"),
@@ -22,4 +26,5 @@ urlpatterns = [
 
     # Popular Recipes
     path("popular/", views.popular_recipes, name="popular_recipes"),
+    path('add-review/', views.add_review, name='add_review'),
 ]

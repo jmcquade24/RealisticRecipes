@@ -140,10 +140,10 @@ def custom_404(request, exception):
     return render(request, "404.html", status=404)
 
 
-def homepage(request):
+def index(request):
     featured_recipes = Recipe.objects.filter(is_featured=True)[:3]  # Get the top 3 featured recipes
     top_categories = Category.objects.all()[:3]  # Get the top 3 categories
-    return render(request, 'recipes/home.html', {
+    return render(request, 'recipes/index.html', {
         'featured_recipes': featured_recipes,
         'top_categories': top_categories
     })
@@ -153,7 +153,7 @@ def homepage(request):
 def edit_recipe(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)
     if request.user != recipe.author:
-        return redirect('home')
+        return redirect('index')
     
     if request.method == 'POST':
         form = RecipeForm(request.POST, instance=recipe)
@@ -200,3 +200,11 @@ def manage_account(request):
         form = UserProfileForm(instance=request.user_profile)
     
     return render(request, 'manage_account.html', {'form': form})
+
+def recipes(request):
+    # Fetch all recipes (or filter as needed)
+    recipes = Recipe.objects.all()
+    context = {
+        'recipes': recipes,
+    }
+    return render(request, 'recipes/recipes.html', context)
