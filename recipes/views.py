@@ -97,9 +97,19 @@ def delete_recipe(request, slug):
 @require_POST
 def like_recipe(request, slug):
     recipe = get_object_or_404(Recipe, slug=slug)
-    recipe.likes += 1
-    recipe.save()
-    return JsonResponse({"success": True, "likes": recipe.likes})
+    user = request.user
+
+    if user in recipe.likes.all():
+        recipe.likes.remove(user)  # Unlike the recipe
+        liked = False
+    else:
+        recipe.likes.add(user)  # Like the recipe
+        liked = True
+
+    return JsonResponse({
+        "liked": liked,
+        "likes_count": recipe.likes.count()
+    })
 
 @login_required
 @require_POST

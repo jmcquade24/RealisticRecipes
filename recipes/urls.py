@@ -1,4 +1,8 @@
 from django.urls import path
+from django.conf.urls.static import static
+from django.conf import settings
+
+
 from . import views  # Use relative import for better modularity
 
 app_name = "recipes"
@@ -29,3 +33,5 @@ urlpatterns = [
     # Popular Recipes
     path("popular/", views.popular_recipes, name="popular_recipes"),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

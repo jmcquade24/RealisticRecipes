@@ -1,4 +1,5 @@
 {% extends "recipes/base.html" %}
+{% load static %}
 
 {% block content %}
 <h1>{{ recipe.title }}</h1>
@@ -29,13 +30,14 @@
 
 <!-- Like Button -->
 <button id="like-btn" data-slug="{{ recipe.slug }}">
-    &#128077; Like (<span id="like-count">{{ recipe.likes }}</span>)
+    {% if request.user in recipe.likes.all %}Unlike{% else %}Like{% endif %}
 </button>
+<span id="like-count">{{ recipe.likes.count }}</span>
 
 <!-- Favorite Button -->
 <button id="favorite-btn" data-slug="{{ recipe.slug }}">
     &#10084; Favorite (<span id="favorite-status">
-    {% if user in recipe.favorites.all %}Added{% else %}Add{% endif %}
+    {% if request.user in recipe.favorites.all %}Added{% else %}Add{% endif %}
     </span>)
 </button>
 
@@ -61,87 +63,6 @@
 <p><a href="{% url 'accounts:login' %}">Log in</a> to leave a review.</p>
 {% endif %}
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Like Button Functionality
-    const likeButton = document.getElementById("like-btn");
-    likeButton.addEventListener("click", function () {
-        const recipeSlug = likeButton.getAttribute("data-slug");
-        const likeCountElement = document.getElementById("like-count");
-
-        fetch(`/recipe/${recipeSlug}/like/`, {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": getCSRFToken(),
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({})
-        })
-        .then(response => response.json())
-        .then(data => {
-            likeCountElement.textContent = data.likes;
-        })
-        .catch(error => console.error("Error liking recipe:", error));
-    });
-
-    // Favorite Button Functionality
-    const favoriteButton = document.getElementById("favorite-btn");
-    favoriteButton.addEventListener("click", function () {
-        const recipeSlug = favoriteButton.getAttribute("data-slug");
-        const favoriteStatus = document.getElementById("favorite-status");
-
-        fetch(`/recipe/${recipeSlug}/favorite/`, {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": getCSRFToken(),
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({})
-        })
-        .then(response => response.json())
-        .then(data => {
-            favoriteStatus.textContent = data.favorited ? "Added" : "Add";
-        })
-        .catch(error => console.error("Error favoriting recipe:", error));
-    });
-
-    // Add Review Form Submission (AJAX)
-    const reviewForm = document.getElementById("review-form");
-    if (reviewForm) {
-        reviewForm.addEventListener("submit", function (event) {
-            event.preventDefault();
-            const formData = new FormData(this);
-            const recipeSlug = "{{ recipe.slug }}";
-
-            fetch(`/recipe/${recipeSlug}/review/`, {
-                method: "POST",
-                headers: { "X-CSRFToken": getCSRFToken() },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                const reviewsList = document.getElementById("reviews");
-                const newReview = document.createElement("li");
-                newReview.innerHTML = `<strong>${data.username}</strong>: (${data.rating}/5) - ${data.comment}`;
-                reviewsList.appendChild(newReview);
-                reviewForm.reset();
-            })
-            .catch(error => console.error("Error submitting review:", error));
-        });
-    }
-
-    // CSRF Token Function
-    function getCSRFToken() {
-        let cookieValue = null;
-        document.cookie.split(";").forEach(cookie => {
-            let [name, value] = cookie.trim().split("=");
-            if (name === "csrftoken") {
-                cookieValue = decodeURIComponent(value);
-            }
-        });
-        return cookieValue;
-    }
-});
-</script>
-
+<!-- Include the external JavaScript file -->
+<script src="{% static '/js/recipe_actions.js' %}"></script>
 {% endblock %}
