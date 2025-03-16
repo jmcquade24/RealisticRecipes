@@ -83,8 +83,27 @@ document.addEventListener("DOMContentLoaded", function () {
                     const reviewsList = document.getElementById("reviews");
 
                     const newReview = document.createElement("li");
-                    newReview.innerHTML = `<strong>${data.review.username}</strong>: (${data.review.rating}/5) - ${data.review.comment}`;
+                    const username = document.createElement("strong");
+                    username.textContent = data.review.username;
+                    newReview.appendChild(username);
 
+                    const rating = document.createElement("span");
+                    rating.classList.add("rating");
+                    for (let i = 1; i <= 5; i++) {
+                        const star = document.createElement("i");
+                        if (i <= data.review.rating) {
+                            star.classList.add("fas", "fa-star");
+                        } else {
+                            star.classList.add("far", "fa-star");
+                        }
+                        rating.appendChild(star);
+                    }
+                    newReview.appendChild(rating);
+
+                    const comment = document.createElement("p");
+                    comment.classList.add("comment");
+                    comment.textContent = data.review.comment;
+                    newReview.appendChild(comment);
                     reviewsList.appendChild(newReview);
                     reviewForm.reset();
                 }

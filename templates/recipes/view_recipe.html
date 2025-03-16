@@ -45,7 +45,19 @@
 <h3>Reviews</h3>
 <ul id="reviews">
     {% for review in recipe.review_set.all %}
-        <li><strong>{{ review.user.username }}</strong>: ({{ review.rating }}/5) - {{ review.comment }}</li>
+        <li>
+            <strong>{{ review.user.username }}</strong>
+            <span class="rating">
+                {% for i in "12345" %}
+                    {% if i|add:0 <= review.rating %}
+                        <i class="fas fa-star"></i> <!-- Filled star -->
+                    {% else %}
+                        <i class="far fa-star"></i> <!-- Empty star -->
+                    {% endif %}
+                {% endfor %}
+            </span>
+            <p class="comment">{{ review.comment }}</p>
+        </li>
     {% empty %}
         <li>No reviews yet. Be the first to review!</li>
     {% endfor %}
@@ -55,8 +67,8 @@
 {% if user.is_authenticated %}
 <form id="review-form">
     {% csrf_token %}
-    <input type="number" name="rating" id="rating" min="1" max="5" required>
-    <textarea name="comment" id="comment" required></textarea>
+    <input type="number" name="rating" id="rating" min="1" max="5" placeholder="Rating (1-5)" required>
+    <textarea name="comment" id="comment" placeholder="Write your review..." maxlength="500" required></textarea>
     <button type="submit">Submit Review</button>
 </form>
 {% else %}
