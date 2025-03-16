@@ -127,8 +127,16 @@ def add_review(request, slug):
     rating = request.POST["rating"]
     comment = request.POST["comment"]
     recipe = get_object_or_404(Recipe, slug=slug)
-    Review.objects.create(recipe=recipe, user=request.user, rating=rating, comment=comment)
-    return redirect("recipes:view_recipe", slug=slug)
+    review = Review.objects.create(recipe=recipe, user=request.user, rating=rating, comment=comment)
+    
+    return JsonResponse({
+        "success": True,
+        "review": {
+            "username": review.user.username,
+            "rating": review.rating,
+            "comment": review.comment,
+        }
+    })
 
 @login_required
 def view_favorites(request):

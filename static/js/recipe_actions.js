@@ -79,11 +79,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 return response.json();
             })
             .then(data => {
-                const reviewsList = document.getElementById("reviews");
-                const newReview = document.createElement("li");
-                newReview.innerHTML = `<strong>${data.username}</strong>: (${data.rating}/5) - ${data.comment}`;
-                reviewsList.appendChild(newReview);
-                reviewForm.reset();
+                if (data.success) {
+                    const reviewsList = document.getElementById("reviews");
+
+                    const newReview = document.createElement("li");
+                    newReview.innerHTML = `<strong>${data.review.username}</strong>: (${data.review.rating}/5) - ${data.review.comment}`;
+
+                    reviewsList.appendChild(newReview);
+                    reviewForm.reset();
+                }
             })
             .catch(error => console.error("Error submitting review:", error));
         });
