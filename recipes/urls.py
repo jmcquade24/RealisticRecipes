@@ -19,12 +19,13 @@ urlpatterns = [
 
     # Categories & Interactions
     path("categories/", views.view_categories, name="view_categories"),
+    path("category/<int:category_id>/", views.view_category, name="view_category"),
     path("recipe/<slug:slug>/like/", views.like_recipe, name="like_recipe"),  # Uses AJAX
     path("recipe/<slug:slug>/favorite/", views.favorite_recipe, name="favorite_recipe"),
     path("recipe/<slug:slug>/review/", views.add_review, name="add_review"),
+    path('add-review/', views.add_review, name='add_review'),
     path("favorites/", views.view_favorites, name="view_favorites"),
 
     # Popular Recipes
     path("popular/", views.popular_recipes, name="popular_recipes"),
-    path('add-review/', views.add_review, name='add_review'),
 ]

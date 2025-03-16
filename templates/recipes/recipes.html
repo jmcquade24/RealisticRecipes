@@ -4,21 +4,15 @@
 <h2>Recipes</h2>
 <ul>
     {% for recipe in recipes %}
-        <li>{{ recipe.name }} - <a href="{% url 'recipes:view_recipe' recipe.id %}">View</a></li>
+        <li>{{ recipe.title }} - <a href="{% url 'recipes:view_recipe' recipe.slug %}">View</a></li>
     {% empty %}
         <p>No recipes available.</p>
     {% endfor %}
 </ul>
 <h3>Add a Recipe</h3>
-<form method="post">
+<form method="post" action="{% url 'recipes:create_recipe' %}">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Add Recipe</button>
-</form>
-<h3>Review a Recipe</h3>
-<form method="post">
-    {% csrf_token %}
-    {{ review_form.as_p }}
-    <button type="submit">Submit Review</button>
 </form>
 {% endblock %}

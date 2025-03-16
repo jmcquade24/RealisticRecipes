@@ -1,11 +1,31 @@
-{% extends "base.html" %}
+{% extends "recipes/base.html" %}
 
 {% block content %}
 <h1>{{ recipe.title }}</h1>
+
+<!-- Recipe Image -->
+{% if recipe.image %}
+    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" style="max-width: 100%; height: auto;">
+{% endif %}
+
+<!-- Basic Recipe Information -->
 <p><strong>Author:</strong> {{ recipe.author.username }}</p>
+<p><strong>Category:</strong> {{ recipe.category.name }}</p>
 <p><strong>Description:</strong> {{ recipe.description }}</p>
 <p><strong>Ingredients:</strong> {{ recipe.ingredients }}</p>
 <p><strong>Instructions:</strong> {{ recipe.instructions }}</p>
+
+<!-- Preparation and Cooking Time -->
+<p><strong>Preparation Time:</strong> {{ recipe.prep_time }} minutes</p>
+<p><strong>Cooking Time:</strong> {{ recipe.cook_time }} minutes</p>
+<p><strong>Servings:</strong> {{ recipe.servings }}</p>
+
+<!-- Featured Recipe -->
+<p><strong>Featured:</strong> {% if recipe.is_featured %}Yes{% else %}No{% endif %}</p>
+
+<!-- Timestamps -->
+<p><strong>Created At:</strong> {{ recipe.created_at }}</p>
+<p><strong>Last Updated:</strong> {{ recipe.updated_at }}</p>
 
 <!-- Like Button -->
 <button id="like-btn" data-slug="{{ recipe.slug }}">

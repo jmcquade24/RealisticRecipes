@@ -13,7 +13,7 @@
                 <img src="{{ recipe.image_url }}" alt="{{ recipe.title }}">
                 <h3>{{ recipe.title }}</h3>
                 <p>{{ recipe.description }}</p>
-                <a href="{% url 'recipes:view_recipe' recipe.id %}">View Recipe</a>
+                <a href="{% url 'recipes:view_recipe' recipe.slug %}">View Recipe</a>
             </div>
             {% endfor %}
         </div>

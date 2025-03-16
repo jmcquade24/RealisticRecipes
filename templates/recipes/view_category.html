@@ -1,0 +1,17 @@
+{% extends "recipes/base.html" %}
+
+{% block title %}{{ category.name }}{% endblock %}
+
+{% block content %}
+<h1>{{ category.name }}</h1>
+<p>{{ category.description }}</p>
+
+<h2>Recipes in this Category</h2>
+<ul>
+    {% for recipe in recipes %}
+    <li>
+        <a href="{% url 'recipes:view_recipe' recipe.slug %}">{{ recipe.title }}</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
