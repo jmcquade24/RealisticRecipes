@@ -1,4 +1,5 @@
 {% extends "recipes/base.html" %}
+{% load static %}
 {% block title %}Recipes Page{% endblock %}
 {% block content %}
 <div class="recipes-page">
@@ -7,7 +8,9 @@
         {% for recipe in recipes %}
             <div class="recipe-card">
                 {% if recipe.image %}
-                    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-image">
+                <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-image">
+            {% else %}
+                <img src="{% static 'images/default-recipe.jpg' %}" alt="Default Recipe Image" class="recipe-image">
                 {% endif %}
                 <div class="recipe-details">
                     <h3>{{ recipe.title }}</h3>
