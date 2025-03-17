@@ -31,6 +31,11 @@ class SignUpForm(UserCreationForm):
             user.save()
         return user
 
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["username", "email"]
+
 class ReviewForm(forms.ModelForm):
     RATING_CHOICES = [
         (1, '1 - Poor'),
