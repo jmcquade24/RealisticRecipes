@@ -46,8 +46,30 @@ def user_login(request):
     else:
         return render(request, "recipes/login.html")
 
+@login_required
+def profile_view(request):
+    return render(request, "profile.html")
 
+@login_required
+def manage_account_view(request):
+    if request.method == "POST":
+        form = UserUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect("profile")
+    else:
+        form = UserUpdateForm(instance=request.user)
+    
+    return render(request, "manage_account.html", {"form": form})
 
+@login_required
+def delete_account_view(request):
+    if request.method == "POST":
+        request.user.delete()
+        logout(request)
+        return redirect("home")
+    
+    return render(request, "profile.html")
 
 @login_required
 def user_logout(request):
