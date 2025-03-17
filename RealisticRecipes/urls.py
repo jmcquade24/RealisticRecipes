@@ -19,6 +19,7 @@ from django.urls import include
 from recipes import views
 from django.conf.urls.static import static
 from django.conf import settings
+from recipes.views import profile_view, manage_account_view, delete_account_view
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -29,6 +30,9 @@ urlpatterns = [
     path("accounts/login/", views.user_login, name="login"),
     path("accounts/logout/", views.user_logout, name="logout"),
     path("accounts/delete/", views.delete_account, name="delete_account"),
+    path("manage-account/", manage_account_view, name="manage_account"),
+    path("profile/", profile_view, name="profile"),
+    
 
 ]
 
