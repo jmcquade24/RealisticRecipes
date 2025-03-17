@@ -20,6 +20,7 @@ from recipes import views
 from django.conf.urls.static import static
 from django.conf import settings
 from recipes.views import profile_view, manage_account_view, delete_account_view
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -32,7 +33,8 @@ urlpatterns = [
     path("accounts/delete/", views.delete_account, name="delete_account"),
     path("manage-account/", manage_account_view, name="manage_account"),
     path("profile/", profile_view, name="profile"),
-    
+    path('password_change/', auth_views.PasswordChangeView.as_view(), name='password_change'),
+    path('password_change_done/', auth_views.PasswordChangeDoneView.as_view(), name='password_change_done') 
 
 ]
 

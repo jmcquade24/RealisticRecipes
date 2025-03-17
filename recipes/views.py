@@ -180,6 +180,19 @@ def popular_recipes(request):
 def custom_404(request, exception):
     return render(request, "404.html", status=404)
 
+def feedback_view(request):
+    if request.method == "POST":
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            feedback = form.save(commit=False)
+            if request.user.is_authenticated:
+                feedback.user = request.user
+            feedback.save()
+            return redirect('thank_you')
+    else:
+        form = FeedbackForm()
+
+    return render(request, 'feedback.html', {'form': form})
 
 @login_required
 def edit_recipe(request, recipe_id):
@@ -197,10 +210,12 @@ def edit_recipe(request, recipe_id):
     
     return render(request, 'edit_recipe.html', {'form': form})
 
+@login_required
 def user_profile(request, username):
     user = get_object_or_404(User, username=username)
-    recipes = Recipe.objects.filter(author=user)
-    liked_recipes = user.liked_recipes.all()
+    recipes = Recipe.objects.filter(author=user).select_related('author')
+    liked_recipes = user.liked_recipes.all().select_related('author') 
+
     return render(request, 'user_profile.html', {
         'profile_user': user,
         'recipes': recipes,
@@ -230,8 +245,18 @@ def manage_account(request):
             return redirect('user_profile', username=request.user.username)
     else:
         form = UserProfileForm(instance=request.user_profile)
+
+    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+    if request.method == "POST":
+        form = ProfilePictureForm(request.POST, request.FILES, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_account')
+    else:
+        form = ProfilePictureForm(instance=user_profile)
     
-    return render(request, 'manage_account.html', {'form': form})
+    return render(request, 'manage_account.html', {'form': form, 'user_profile': user_profile})
 
 def recipes(request):
     # Fetch all recipes (or filter as needed)
