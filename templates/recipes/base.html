@@ -18,6 +18,9 @@
                 <li><a href="{% url 'recipes:about' %}">About</a></li>
                 <li><a href="{% url 'recipes:view_categories' %}">Categories</a></li>
                 <li><a href="{% url 'recipes:recipes' %}">Recipes</a></li>
+                <script async src="https://cse.google.com/cse.js?cx=d2f99163c4ce9448e">
+                </script>
+                <div class="gcse-search"></div>
                 {% if user.is_authenticated %}
                 <li><a href="{% url 'recipes:logout' %}">Logout</a></li>
                 {% else %}
