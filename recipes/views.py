@@ -88,24 +88,6 @@ def delete_account(request):
 @login_required
 def create_recipe(request):
     if request.method == "POST":
-<<<<<<< HEAD
-        title = request.POST["title"]
-        description = request.POST["description"]
-
-        if not title or not description:
-            return render(request, "recipes/recipe.html", {"categories": Category.objects.all(), "error": "Title and description are required"})
-
-        try:
-            category = Category.objects.get(id=request.POST["category"])
-        except Category.DoesNotExist:
-            return render(request, "recipes/recipe.html", {"categories": Category.objects.all(), "error": "Invalid category selected"})
-
-        recipe = Recipe.objects.create(title=title, description=description, category=category, author=request.user)
-        return redirect("recipes:view_recipe", slug=recipe.slug)
-
-    categories = Category.objects.all()
-    return render(request, "recipes/recipe.html", {"categories": categories})
-=======
         form = RecipeForm(request.POST, request.FILES)
         if form.is_valid():
             recipe = form.save(commit=False)
@@ -119,7 +101,6 @@ def create_recipe(request):
         form = RecipeForm()
     
     return render(request, "recipes/create_recipe.html", {"form": form})
->>>>>>> c295638d7361b0e4ea48218ba0be8d7ed5dcd8a4
 
 def view_recipe(request, slug):
     recipe = get_object_or_404(Recipe, slug=slug)
