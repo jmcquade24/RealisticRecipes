@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "recipes/base.html" %}
 
 {% block title %}Login Page{% endblock %}
 
@@ -15,4 +15,7 @@
 {% if error %}
     <p class="error">{{ error }}</p>
 {% endif %}
+
+<p>Don't have an account? <a href="{% url 'signup' %}">Sign up here</a></p>
+<p><a href="#">Forgot your password?</a></p>
 {% endblock %}

@@ -1,27 +1,40 @@
 <!DOCTYPE html>
+
+{% load staticfiles %}
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %} Realistic Recipes{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <header>
         <h1>Realistic Recipes </h1>
         <nav>
             <ul>
-                <li><a href="{% url 'home' %}">Home</a></li>
-                <li><a href="{% url 'about' %}">About</a></li>
-                <li><a href="{% url 'categories' %}">Categories</a></li>
-                <li><a href="{% url 'recipes' %}">Recipes</a></li>
+                <li><a href="{% url 'index' %}">Home</a></li>
+                <li><a href="{% url 'recipes:about' %}">About</a></li>
+                <li><a href="{% url 'recipes:view_categories' %}">Categories</a></li>
+                <li><a href="{% url 'recipes:recipes' %}">Recipes</a></li>
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'recipes:logout' %}">Logout</a></li>
+                {% else %}
+                <li><a href="{% url 'recipes:login' %}">Login</a></li>
+                <li><a href="{% url 'recipes:register' %}">Register</a></li>
+                <a href="{% url 'manage_account' %}">Manage Account</a>
+                <a href="{% url 'profile' %}">Profile</a>
+
+                {% endif %}
             </ul>
         </nav>
     </header>
 
     <main>
         {% block content %}{% endblock %}
-        {% include 'navbar.html' %}
+        {% include 'recipes/navbar.html' %}
     </main>
 
     <footer>

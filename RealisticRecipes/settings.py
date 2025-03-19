@@ -15,6 +15,9 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATICFILES_DIRS = [STATIC_DIR, ]
 
 
 # Quick-start development settings - unsuitable for production
@@ -26,7 +29,7 @@ SECRET_KEY = '(5znp0+7*v53o5_+gked%6i%mqh*v8-!$f87gs(3vj8@cc478h'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['2769579r.pythonanywhere.com',]
 
 
 # Application definition
@@ -38,11 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-<<<<<<< HEAD
     'recipes',
-=======
-    'rango'
->>>>>>> 41ec93a ( templates and css)
 ]
 
 MIDDLEWARE = [
@@ -124,3 +123,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = '/home/2769579r/STATIC'
+MEDIA_URL = '/media/'
+
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'

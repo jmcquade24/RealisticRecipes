@@ -20,6 +20,7 @@ class Recipe(models.Model):
     prep_time = models.PositiveIntegerField()
     cook_time = models.PositiveIntegerField()
     servings = models.PositiveIntegerField()
+    is_featured = models.BooleanField(default=False)
     image = models.ImageField(upload_to='recipes/', blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -27,14 +28,27 @@ class Recipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     likes = models.ManyToManyField(User, related_name="liked_recipes", blank=True)
     favorites = models.ManyToManyField(User, related_name="favorited_recipes", blank=True)
+    slug = models.SlugField(unique=True, blank=True)
+
 
     def __str__(self):
         return self.title
 
+    def save(self, *args, **kwargs):
+        if not self.slug:  # Generate a slug if it doesn't exist
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    stars = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    created_at = models.DateTimeField(auto_now_add=True)
+        
+        
 class Review(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    rating = models.IntegerField()
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])    
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -49,6 +63,11 @@ class Like(models.Model):
 
     def __str__(self):
         return f"Like by {self.user.username} on {self.recipe.title}"
+    
+class Feedback(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
     
     
 class UserProfile(models.Model):

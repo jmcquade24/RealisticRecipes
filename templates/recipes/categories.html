@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "recipes/base.html" %}
 {% block title %}Categories Page{% endblock %}
 {% block content %}
 <h2>Categories Page</h2>
@@ -6,7 +6,7 @@
     <h3>Popular Recipes</h3>
     <ul>
         {% for recipe in popular_recipes %}
-            <li>{{ recipe.name }} - <a href="{% url 'recipes:view_recipe' recipe.id %}">View</a></li>
+            <li>{{ recipe.name }} - <a href="{% url 'recipes:view_recipe' recipe.slug %}">View</a></li>
         {% empty %}
             <p>No popular recipes available.</p>
         {% endfor %}
@@ -16,7 +16,7 @@
     <h3>New Recipes</h3>
     <ul>
         {% for recipe in new_recipes %}
-            <li>{{ recipe.name }} - <a href="{% url 'recipes:view_recipe' recipe.id %}">View</a></li>
+            <li>{{ recipe.name }} - <a href="{% url 'recipes:view_recipe' recipe.title %}">View</a></li>
         {% empty %}
             <p>No new recipes available.</p>
         {% endfor %}

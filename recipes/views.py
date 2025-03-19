@@ -3,16 +3,21 @@ from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from .forms import RecipeForm
 from django.views.decorators.csrf import csrf_exempt
 from .models import Recipe, Review, Category, Like
 from django.contrib.auth.models import User
 
 # Home page
 def index(request):
-    return render(request, "recipes/index.html")
-
-def home(request):
-    return render(request, 'recipes/home.html')
+    categories = Category.objects.all()
+    featured_recipes = Recipe.objects.filter(is_featured=True)[:3]  # Get the top 3 featured recipes
+    top_categories = Category.objects.all()[:3]  # Get the top 3 categories
+    return render(request, 'recipes/index.html', {
+        "categories": categories,
+        'featured_recipes': featured_recipes,
+        'top_categories': top_categories
+    })
 
 def about(request):
     return render(request, "recipes/about.html")
@@ -20,18 +25,13 @@ def about(request):
 # User Authentication
 def register(request):
     if request.method == "POST":
+    
         username = request.POST["username"]
         password = request.POST["password"]
-        email = request.POST["email"]
-
-        if User.objects.filter(email=email).exists():
-            return render(request, "recipes/register.html", {"error": "Email already exists"})
-
-        user = User.objects.create_user(username=username, email=email, password=password)
-        login(request, user)
-        return redirect("index")
-    
-    return render(request, "recipes/register.html")
+        user = User.objects.create_user(username=username, password=password)
+        return redirect("login")
+    else:
+        return render(request, "recipes/register.html")
 
 def user_login(request):
     if request.method == "POST":
@@ -43,8 +43,33 @@ def user_login(request):
             return redirect("index")
         else:
             return render(request, "recipes/login.html", {"error": "Invalid credentials"})
+    else:
+        return render(request, "recipes/login.html")
+
+@login_required
+def profile_view(request):
+    return render(request, "profile.html")
+
+@login_required
+def manage_account_view(request):
+    if request.method == "POST":
+        form = UserUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect("profile")
+    else:
+        form = UserUpdateForm(instance=request.user)
     
-    return render(request, "recipes/login.html")
+    return render(request, "manage_account.html", {"form": form})
+
+@login_required
+def delete_account_view(request):
+    if request.method == "POST":
+        request.user.delete()
+        logout(request)
+        return redirect("home")
+    
+    return render(request, "profile.html")
 
 @login_required
 def user_logout(request):
@@ -63,22 +88,38 @@ def delete_account(request):
 @login_required
 def create_recipe(request):
     if request.method == "POST":
+<<<<<<< HEAD
         title = request.POST["title"]
         description = request.POST["description"]
 
         if not title or not description:
-            return render(request, "recipes/create_recipe.html", {"categories": Category.objects.all(), "error": "Title and description are required"})
+            return render(request, "recipes/recipe.html", {"categories": Category.objects.all(), "error": "Title and description are required"})
 
         try:
             category = Category.objects.get(id=request.POST["category"])
         except Category.DoesNotExist:
-            return render(request, "recipes/create_recipe.html", {"categories": Category.objects.all(), "error": "Invalid category selected"})
+            return render(request, "recipes/recipe.html", {"categories": Category.objects.all(), "error": "Invalid category selected"})
 
         recipe = Recipe.objects.create(title=title, description=description, category=category, author=request.user)
         return redirect("recipes:view_recipe", slug=recipe.slug)
 
     categories = Category.objects.all()
-    return render(request, "recipes/create_recipe.html", {"categories": categories})
+    return render(request, "recipes/recipe.html", {"categories": categories})
+=======
+        form = RecipeForm(request.POST, request.FILES)
+        if form.is_valid():
+            recipe = form.save(commit=False)
+            recipe.author = request.user  
+            recipe.save()
+            return redirect("recipes:view_recipe", slug=recipe.slug)
+        else:
+            return render(request, "recipes/create_recipe.html", {"form": form, "error": "Please correct the errors below."})
+    else:
+        # If it's a GET request, render an empty form
+        form = RecipeForm()
+    
+    return render(request, "recipes/create_recipe.html", {"form": form})
+>>>>>>> c295638d7361b0e4ea48218ba0be8d7ed5dcd8a4
 
 def view_recipe(request, slug):
     recipe = get_object_or_404(Recipe, slug=slug)
@@ -97,9 +138,19 @@ def delete_recipe(request, slug):
 @require_POST
 def like_recipe(request, slug):
     recipe = get_object_or_404(Recipe, slug=slug)
-    recipe.likes += 1
-    recipe.save()
-    return JsonResponse({"success": True, "likes": recipe.likes})
+    user = request.user
+
+    if user in recipe.likes.all():
+        recipe.likes.remove(user)  # Unlike the recipe
+        liked = False
+    else:
+        recipe.likes.add(user)  # Like the recipe
+        liked = True
+
+    return JsonResponse({
+        "liked": liked,
+        "likes_count": recipe.likes.count()
+    })
 
 @login_required
 @require_POST
@@ -117,18 +168,27 @@ def add_review(request, slug):
     rating = request.POST["rating"]
     comment = request.POST["comment"]
     recipe = get_object_or_404(Recipe, slug=slug)
-    Review.objects.create(recipe=recipe, user=request.user, rating=rating, comment=comment)
-    return redirect("recipes:view_recipe", slug=slug)
+    review = Review.objects.create(recipe=recipe, user=request.user, rating=rating, comment=comment)
+    
+    return JsonResponse({
+        "success": True,
+        "review": {
+            "username": review.user.username,
+            "rating": review.rating,
+            "comment": review.comment,
+        }
+    })
 
 @login_required
 def view_favorites(request):
     favorites = request.user.favorites.all()
-    return render(request, "recipes/favorites.html", {"favorites": favorites})
+    return render(request, 'recipes/favorites.html', {'favorites': favorites}) 
+
 
 # Categories
 def view_categories(request):
     categories = Category.objects.all()
-    return render(request, "recipes/categories.html", {"categories": categories})
+    return render(request, 'recipes/categories.html', {'categories': categories})
 
 # Popular Recipes
 def popular_recipes(request):
@@ -139,11 +199,93 @@ def popular_recipes(request):
 def custom_404(request, exception):
     return render(request, "404.html", status=404)
 
+def feedback_view(request):
+    if request.method == "POST":
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            feedback = form.save(commit=False)
+            if request.user.is_authenticated:
+                feedback.user = request.user
+            feedback.save()
+            return redirect('thank_you')
+    else:
+        form = FeedbackForm()
 
-def homepage(request):
-    featured_recipes = Recipe.objects.filter(is_featured=True)[:3]  # Get the top 3 featured recipes
-    top_categories = Category.objects.all()[:3]  # Get the top 3 categories
-    return render(request, 'homepage.html', {
-        'featured_recipes': featured_recipes,
-        'top_categories': top_categories
+    return render(request, 'feedback.html', {'form': form})
+
+@login_required
+def edit_recipe(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    if request.user != recipe.author:
+        return redirect('index')
+    
+    if request.method == 'POST':
+        form = RecipeForm(request.POST, instance=recipe)
+        if form.is_valid():
+            form.save()
+            return redirect('view_recipe', recipe_id=recipe.id)
+    else:
+        form = RecipeForm(instance=recipe)
+    
+    return render(request, 'edit_recipe.html', {'form': form})
+
+@login_required
+def user_profile(request, username):
+    user = get_object_or_404(User, username=username)
+    recipes = Recipe.objects.filter(author=user).select_related('author')
+    liked_recipes = user.liked_recipes.all().select_related('author') 
+
+    return render(request, 'user_profile.html', {
+        'profile_user': user,
+        'recipes': recipes,
+        'liked_recipes': liked_recipes
     })
+    
+def search_recipes(request):
+    query = request.GET.get('q')
+    if query:
+        recipes = Recipe.objects.filter(
+            models.Q(title__icontains=query) |
+            models.Q(ingredients__icontains=query) |
+            models.Q(tags__name__icontains=query)
+        ).distinct()
+    else:
+        recipes = Recipe.objects.none()
+    
+    return render(request, 'search_results.html', {'recipes': recipes, 'query': query})
+
+@login_required
+def manage_account(request):
+    user_profile = request.user.userprofile
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('user_profile', username=request.user.username)
+    else:
+        form = UserProfileForm(instance=request.user_profile)
+
+    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+    if request.method == "POST":
+        form = ProfilePictureForm(request.POST, request.FILES, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_account')
+    else:
+        form = ProfilePictureForm(instance=user_profile)
+    
+    return render(request, 'manage_account.html', {'form': form, 'user_profile': user_profile})
+
+def recipes(request):
+    # Fetch all recipes (or filter as needed)
+    recipes = Recipe.objects.all()
+    context = {
+        'recipes': recipes,
+    }
+    return render(request, 'recipes/recipes.html', context)
+
+def view_category(request, category_id):
+    category = get_object_or_404(Category, id=category_id)
+    recipes = Recipe.objects.filter(category=category)  
+    return render(request, "recipes/view_category.html", {"category": category, "recipes": recipes})
