@@ -150,3 +150,49 @@ class RecipeAPITestCase(APITestCase):
     def test_api_pagination(self):
         response = self.client.get("/api/recipes/?page=1")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+# UI TESTS USING SELENIUM
+class UITestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.driver = webdriver.Chrome()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.driver.quit()
+
+    def test_login_page(self):
+        self.driver.get("http://127.0.0.1:8000/login/")
+        username_field = self.driver.find_element(By.NAME, "username")
+        password_field = self.driver.find_element(By.NAME, "password")
+        submit_button = self.driver.find_element(By.NAME, "submit")
+
+        username_field.send_keys("testuser")
+        password_field.send_keys("testpass")
+        submit_button.click()
+
+        time.sleep(2)
+        self.assertIn("Dashboard", self.driver.title)
+
+    def test_recipe_submission(self):
+        self.driver.get("http://127.0.0.1:8000/recipes/new/")
+        title_field = self.driver.find_element(By.NAME, "title")
+        desc_field = self.driver.find_element(By.NAME, "description")
+        submit_button = self.driver.find_element(By.NAME, "submit")
+
+        title_field.send_keys("New Recipe")
+        desc_field.send_keys("Testing automated form submission")
+        submit_button.click()
+
+        time.sleep(2)
+        self.assertIn("Recipes", self.driver.title)
+
+    def test_logout(self):
+        self.driver.get("http://127.0.0.1:8000/logout/")
+        time.sleep(2)
+        self.assertIn("Login", self.driver.title)
+
+# RUN THE TESTS
+if __name__ == "__main__":
+    unittest.main()

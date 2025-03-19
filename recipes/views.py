@@ -99,11 +99,10 @@ def user_logout(request):
 
 @login_required
 def delete_account(request):
-    if not request.user.is_authenticated:
-        return redirect("accounts:login")  
-    
     request.user.delete()
-    return redirect("index")
+    logout(request)
+    return redirect("recipes:index")
+
 
 # Recipe Management
 @login_required
@@ -117,34 +116,23 @@ def create_recipe(request):
             return redirect("recipes:recipe_detail", recipe.id)
     else:
         form = RecipeForm()
-<<<<<<< HEAD
-    return render(request, "recipes/recipe.html", {"form": form})
-=======
     
     return render(request, "recipes/create_recipe.html", {"form": form})
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 9aefe776396c0b8c47b9b10655d0e1431ef847ea
-=======
->>>>>>> 9aefe776396c0b8c47b9b10655d0e1431ef847ea
-=======
->>>>>>> 9aefe776396c0b8c47b9b10655d0e1431ef847ea
->>>>>>> Stashed changes
 
 def view_recipe(request, recipe_id):
-    recipe = get_object_or_404(Recipe, id=recipe_id)
-    reviews = Review.objects.filter(recipe=recipe)
+    recipe = get_object_or_404(Recipe.objects.select_related('author'), id=recipe_id)
+    reviews = Review.objects.filter(recipe=recipe).select_related('user')
     return render(request, "recipes/view_recipe.html", {"recipe": recipe, "reviews": reviews})
 
+
 @login_required
-def delete_recipe(request, slug):
-    recipe = get_object_or_404(Recipe, slug=slug)
-    if recipe.author == request.user:  # Ensuring only the creator can delete
+def delete_recipe(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    if recipe.author == request.user:
         recipe.delete()
         return redirect("recipes:index")
-    return redirect("recipes:view_recipe", slug=slug)
+    return redirect("recipes:view_recipe", recipe_id=recipe.id)
+
 
 @login_required
 def edit_recipe(request, recipe_id):
@@ -162,24 +150,24 @@ def edit_recipe(request, recipe_id):
 
     return render(request, "edit_recipe.html", {"form": form})
 
+
 # Recipe Interactions
+@csrf_exempt
 @login_required
 @require_POST
-def like_recipe(request, slug):
-    recipe = get_object_or_404(Recipe, slug=slug)
+def like_recipe(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
     user = request.user
 
     if user in recipe.likes.all():
-        recipe.likes.remove(user)  # Unlike the recipe
+        recipe.likes.remove(user)
         liked = False
     else:
-        recipe.likes.add(user)  # Like the recipe
+        recipe.likes.add(user)
         liked = True
 
-    return JsonResponse({
-        "liked": liked,
-        "likes_count": recipe.likes.count()
-    })
+    return JsonResponse({"liked": liked, "likes_count": recipe.likes.count()})
+
 
 @login_required
 @require_POST
@@ -258,21 +246,6 @@ def feedback_view(request):
 
     return render(request, 'feedback.html', {'form': form})
 
-@login_required
-def edit_recipe(request, recipe_id):
-    recipe = get_object_or_404(Recipe, id=recipe_id)
-    if request.user != recipe.author:
-        return redirect('index')
-    
-    if request.method == 'POST':
-        form = RecipeForm(request.POST, instance=recipe)
-        if form.is_valid():
-            form.save()
-            return redirect('view_recipe', recipe_id=recipe.id)
-    else:
-        form = RecipeForm(instance=recipe)
-    
-    return render(request, 'edit_recipe.html', {'form': form})
 
 @login_required
 def user_profile(request, username):
