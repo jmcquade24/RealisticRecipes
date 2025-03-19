@@ -23,23 +23,32 @@ from recipes.views import profile_view, manage_account_view, delete_account_view
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
+    # Core routes
     path('', views.index, name='index'),
     path('recipes/', include('recipes.urls')),
     path('admin/', admin.site.urls),
+
+    # Authentication
     path('recipes/', include('recipes.urls')),
     path("accounts/signup/", views.register, name="signup"), 
     path("accounts/login/", views.user_login, name="login"),
     path("accounts/logout/", views.user_logout, name="logout"),
     path("accounts/delete/", views.delete_account, name="delete_account"),
+
+    # User Account Management
     path("manage-account/", manage_account_view, name="manage_account"),
     path("profile/", profile_view, name="profile"),
+
+    # Password Management
     path('password_change/', auth_views.PasswordChangeView.as_view(), name='password_change'),
     path('password_change_done/', auth_views.PasswordChangeDoneView.as_view(), name='password_change_done') 
 
 ]
 
+# Custom 404 Handler
 handler404 = "recipes.views.custom_404"
 
+# Serving media and static files in developmen
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

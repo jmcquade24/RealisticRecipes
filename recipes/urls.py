@@ -1,8 +1,6 @@
 from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
-
-
 from . import views  # Use relative import for better modularity
 
 app_name = "recipes"
@@ -11,6 +9,8 @@ urlpatterns = [
     # Core pages
     path("", views.index, name="index"),
     path("about/", views.about, name="about"),
+
+    # Authentication
     path("register", views.register, name="register"),  
     path("login/", views.user_login, name="login"),  
     path("logout/", views.user_logout, name="logout"), 
@@ -30,9 +30,19 @@ urlpatterns = [
     path('add-review/', views.add_review, name='add_review'),
     path("favorites/", views.view_favorites, name="view_favorites"),
 
-    # Popular Recipes
+    # Popular & Search
     path("popular/", views.popular_recipes, name="popular_recipes"),
+    path("search/", views.search_recipes, name="search_recipes"),
+
+    # User Profiles
+    path("profile/<str:username>/", views.user_profile, name="user_profile"),
+
+    # Feedback
+    path("feedback/", views.feedback_view, name="feedback"),
+
 ]
+
+# Serving media and static files in development
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
