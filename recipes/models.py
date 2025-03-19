@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.text import slugify
+import uuid
 
 
 # Create your models here.
@@ -28,7 +29,7 @@ class Recipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     likes = models.ManyToManyField(User, related_name="liked_recipes", blank=True)
     favorites = models.ManyToManyField(User, related_name="favorited_recipes", blank=True)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=False, blank=True)
 
 
     def __str__(self):
