@@ -37,6 +37,7 @@ urlpatterns = [
 
     # User Profiles
     path("profile/<str:username>/", views.user_profile, name="user_profile"),
+    path("profile/<str:username>/manage-profile/", views.manage_account, name="manage_account"),
 
     # Feedback
     path("feedback/", views.feedback_view, name="feedback"),
