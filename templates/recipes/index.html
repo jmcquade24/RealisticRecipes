@@ -16,9 +16,9 @@
                 {% else %}
                     <img src="{% static 'images/default-recipe.jpg' %}" alt="Default Recipe Image">
                 {% endif %}
-                <h3>{{ recipe.title }}</h3>
-                <p>{{ recipe.description }}</p>
-                <a href="{% url 'recipes:view_recipe' recipe.slug %}">View Recipe</a>
+                    <h3>{{ recipe.title }}</h3>
+                    <p>{{ recipe.description }}</p>
+                    <a href="{% url 'recipes:view_recipe' recipe.slug %}" class="btn-view">View Recipe</a>
             </div>
             {% endfor %}
         </div>
@@ -26,11 +26,12 @@
 
     <div class="categories">
         <h2>Top Categories</h2>
-        <ul>
+        <ul class="category-list">
             {% for category in top_categories %}
             <li><a href="{% url 'recipes:view_category' category.id %}">{{ category.name }}</a></li>
             {% endfor %}
         </ul>
     </div>
+</div>
 </div>
 {% endblock %}

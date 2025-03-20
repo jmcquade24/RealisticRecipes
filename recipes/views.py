@@ -124,6 +124,28 @@ def view_recipe(request, recipe_id):
     reviews = Review.objects.filter(recipe=recipe).select_related('user')
     return render(request, "recipes/view_recipe.html", {"recipe": recipe, "reviews": reviews})
 
+@login_required
+def edit_recipe(request, slug):
+    print(f"Slug: {slug}")
+    recipe = get_object_or_404(Recipe, slug=slug)
+
+    # Ensure only the recipe author can edit the recipe
+    if request.user != recipe.author:
+        return redirect('recipes:view_recipe', slug=slug)
+
+    if request.method == 'POST':
+        form = RecipeForm(request.POST, request.FILES, instance=recipe)
+        if form.is_valid():
+            form.save()
+            return redirect('recipes:view_recipe', slug=slug)
+    else:
+        form = RecipeForm(instance=recipe)
+
+    context = {
+        'form': form,
+        'recipe': recipe,
+    }
+    return render(request, 'recipes/edit_recipe.html', context)
 
 @login_required
 def delete_recipe(request, recipe_id):

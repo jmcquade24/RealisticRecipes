@@ -5,12 +5,19 @@
 <div class="container">
     <h1>{{ recipe.title }}</h1>
 
-    <!-- Recipe Image -->
-    {% if recipe.image %}
-        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" style="max-width: 100%; height: auto;">
+    <!-- Edit Button (Visible only to the recipe author) -->
+    {% if request.user == recipe.author %}
+        <a href="{% url 'recipes:edit_recipe' recipe.slug %}" class="btn-edit">Edit Recipe</a>
     {% endif %}
 
-    <div class="recipe-info"></div>
+    <!-- Recipe Image -->
+    {% if recipe.image %}
+        <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+    {% else %}
+        <img src="{% static 'images/default-recipe.jpg' %}" alt="Default Recipe Image">
+    {% endif %}
+
+    <div class="recipe-info">
         <!-- Basic Recipe Information -->
         <p><strong>Author:</strong> {{ recipe.author.username }}</p>
         <p><strong>Category:</strong> {{ recipe.category.name }}</p>
