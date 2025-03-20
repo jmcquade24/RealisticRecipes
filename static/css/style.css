@@ -494,3 +494,167 @@ footer {
 .btn-cancel:hover {
     background-color: #5a6268;
 }
+
+/* Index Page Styles */
+.index-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.index-page h2 {
+    font-size: 2.5em;
+    color: #28a745;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.index-page .subtitle {
+    font-size: 1.2em;
+    color: #555;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* View Recipe Button */
+.btn-view {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #28a745; /* Green color */
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 1em;
+    text-align: center;
+    transition: background-color 0.2s;
+}
+
+.btn-view:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+/* Featured Recipes Section */
+.featured {
+    margin-bottom: 40px;
+}
+
+.featured h2 {
+    font-size: 2em;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Top Categories Section */
+.categories {
+    margin-bottom: 40px;
+}
+
+.categories h2 {
+    font-size: 2em;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.category-list {
+    list-style-type: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.category-list li {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.category-list li:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.category-list a {
+    color: #333;
+    text-decoration: none;
+    font-size: 1.1em;
+}
+
+.category-list a:hover {
+    color: #28a745;
+}
+
+/* Edit Button */
+.btn-edit {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #ffc107; /* Yellow color */
+    color: #333;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 1em;
+    margin-bottom: 20px;
+    transition: background-color 0.2s;
+}
+
+.btn-edit:hover {
+    background-color: #e0a800; /* Darker yellow on hover */
+}
+
+/* Edit Recipe Page */
+.edit-recipe-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.edit-recipe-page h2 {
+    font-size: 2em;
+    color: #28a745;
+    margin-bottom: 20px;
+}
+
+.edit-recipe-page form {
+    margin-top: 20px;
+}
+
+.edit-recipe-page .btn-save {
+    background-color: #28a745; /* Green color */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s;
+}
+
+.edit-recipe-page .btn-save:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+.edit-recipe-page .btn-cancel {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #6c757d; /* Gray color */
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 1em;
+    margin-left: 10px;
+    transition: background-color 0.2s;
+}
+
+.edit-recipe-page .btn-cancel:hover {
+    background-color: #5a6268; /* Darker gray on hover */
+}
