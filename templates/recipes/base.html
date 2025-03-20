@@ -21,12 +21,11 @@
                 <li><a href="{% url 'recipes:recipes' %}">Recipes</a></li>
                 {% if user.is_authenticated %}
                 <li><a href="{% url 'recipes:logout' %}">Logout</a></li>
+                <li><a href="{% url 'manage_account' %}">Manage Account</a></li>
+                <li><a href="{% url 'profile' %}">Profile</a></li>
                 {% else %}
                 <li><a href="{% url 'recipes:login' %}">Login</a></li>
                 <li><a href="{% url 'recipes:register' %}">Register</a></li>
-                <a href="{% url 'manage_account' %}">Manage Account</a>
-                <a href="{% url 'profile' %}">Profile</a>
-
                 {% endif %}
             </ul>
         </nav>
