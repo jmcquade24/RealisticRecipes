@@ -295,27 +295,27 @@ def search_recipes(request):
     return render(request, 'search_results.html', {'recipes': recipes, 'query': query})
 
 @login_required
-def manage_account(request):
-    user_profile = request.user.userprofile
-    if request.method == 'POST':
-        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
-        if form.is_valid():
-            form.save()
-            return redirect('user_profile', username=request.user.username)
-    else:
-        form = UserProfileForm(instance=request.user_profile)
-
+def manage_account(request, username=None):  
     user_profile, created = UserProfile.objects.get_or_create(user=request.user)
 
-    if request.method == "POST":
-        form = ProfilePictureForm(request.POST, request.FILES, instance=user_profile)
-        if form.is_valid():
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+        profile_picture_form = ProfilePictureForm(request.POST, request.FILES, instance=user_profile)
+
+        # If both forms are valid, save the changes and redirect
+        if form.is_valid() and profile_picture_form.is_valid():
             form.save()
-            return redirect('manage_account')
+            profile_picture_form.save()
+            return redirect('user_profile', username=request.user.username)
     else:
-        form = ProfilePictureForm(instance=user_profile)
+        form = UserProfileForm(instance=user_profile)
+        profile_picture_form = ProfilePictureForm(instance=user_profile)
     
-    return render(request, 'manage_account.html', {'form': form, 'user_profile': user_profile})
+    return render(request, 'recipes/manage_account.html', {
+        'form': form,
+        'profile_picture_form': profile_picture_form,
+        'user_profile': user_profile
+    })
 
 def recipes(request):
     # Fetch all recipes (or filter as needed)

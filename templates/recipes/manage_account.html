@@ -1,23 +1,29 @@
-{% extends "base.html" %}
+{% extends "recipes/base.html" %}
 {% block title %}Manage Account{% endblock %}
 {% block content %}
 <h2>Manage Account</h2>
-<form method="post">
+
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Update Account</button>
 </form>
+
 <hr>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ profile_picture_form.as_p }}
+    <button type="submit">Update Profile Picture</button>
+</form>
+
+<hr>
+
 <h3>Delete Account</h3>
 <p>Warning: Deleting your account is irreversible.</p>
 <form method="post" action="{% url 'delete_account' %}">
     {% csrf_token %}
     <button type="submit" style="color: red;">Delete Account</button>
-
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Update Profile</button>
 </form>
 
 {% endblock %}
