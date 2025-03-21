@@ -275,7 +275,7 @@ def user_profile(request, username):
     recipes = Recipe.objects.filter(author=user).select_related('author')
     liked_recipes = user.liked_recipes.all().select_related('author') 
 
-    return render(request, 'user_profile.html', {
+    return render(request, 'recipes/profile.html', {
         'profile_user': user,
         'recipes': recipes,
         'liked_recipes': liked_recipes
