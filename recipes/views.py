@@ -126,26 +126,17 @@ def view_recipe(request, recipe_id):
 
 @login_required
 def edit_recipe(request, slug):
-    print(f"Slug: {slug}")
     recipe = get_object_or_404(Recipe, slug=slug)
-
-    # Ensure only the recipe author can edit the recipe
     if request.user != recipe.author:
         return redirect('recipes:view_recipe', slug=slug)
 
-    if request.method == 'POST':
-        form = RecipeForm(request.POST, request.FILES, instance=recipe)
-        if form.is_valid():
-            form.save()
-            return redirect('recipes:view_recipe', slug=slug)
-    else:
-        form = RecipeForm(instance=recipe)
+    form = RecipeForm(request.POST or None, request.FILES or None, instance=recipe)
+    if form.is_valid():
+        form.save()
+        return redirect("recipes:view_recipe", slug=recipe.slug)
 
-    context = {
-        'form': form,
-        'recipe': recipe,
-    }
-    return render(request, 'recipes/edit_recipe.html', context)
+    return render(request, "recipes/edit_recipe.html", {"form": form, "recipe": recipe})
+
 
 @login_required
 def delete_recipe(request, recipe_id):
@@ -154,23 +145,6 @@ def delete_recipe(request, recipe_id):
         recipe.delete()
         return redirect("recipes:index")
     return redirect("recipes:view_recipe", recipe_id=recipe.id)
-
-
-@login_required
-def edit_recipe(request, recipe_id):
-    recipe = get_object_or_404(Recipe, id=recipe_id)
-    if request.user != recipe.author:
-        return redirect("recipes:index")
-
-    if request.method == "POST":
-        form = RecipeForm(request.POST, instance=recipe)
-        if form.is_valid():
-            form.save()
-            return redirect("recipes:view_recipe", recipe_id=recipe.id)
-    else:
-        form = RecipeForm(instance=recipe)
-
-    return render(request, "edit_recipe.html", {"form": form})
 
 
 # Recipe Interactions
@@ -243,12 +217,13 @@ def search_recipes(request):
     query = request.GET.get("q")
     if query:
         recipes = Recipe.objects.filter(
-            Q(title__icontains=query) | Q(ingredients__icontains=query)
+            Q(title__icontains=query) |
+            Q(ingredients__icontains=query)
         ).distinct()
     else:
         recipes = Recipe.objects.none()
-    
     return render(request, "search_results.html", {"recipes": recipes, "query": query})
+
 
 # Custom 404 Page
 def custom_404(request, exception):
@@ -280,19 +255,6 @@ def user_profile(request, username):
         'recipes': recipes,
         'liked_recipes': liked_recipes
     })
-    
-def search_recipes(request):
-    query = request.GET.get('q')
-    if query:
-        recipes = Recipe.objects.filter(
-            models.Q(title__icontains=query) |
-            models.Q(ingredients__icontains=query) |
-            models.Q(tags__name__icontains=query)
-        ).distinct()
-    else:
-        recipes = Recipe.objects.none()
-    
-    return render(request, 'search_results.html', {'recipes': recipes, 'query': query})
 
 @login_required
 def manage_account(request, username=None):  
