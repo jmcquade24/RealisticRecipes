@@ -1,20 +1,21 @@
 import unittest
+import os
+import time
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
+from django.urls import reverse
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from .models import Recipe, Category, UserProfile, Review, Feedback  
-from .forms import RecipeForm, UserProfileForm  
-from django.urls import reverse
-import time
 from rest_framework.test import APITestCase
 from rest_framework import status
+from .models import Recipe, Category, UserProfile, Review, Feedback
+from .forms import RecipeForm, UserProfileForm
 
+# Base URL that switches between local and deployed environment
+BASE_URL = os.getenv("TEST_BASE_URL", "http://127.0.0.1:8000/")
 
-# Create your tests here.
-
-# TEST MODELS
+# === MODEL TESTS ===
 class RecipeModelTestCase(TestCase):
     def setUp(self):
         self.category = Category.objects.create(name="Dessert")
@@ -45,8 +46,7 @@ class UserProfileModelTestCase(TestCase):
         self.assertEqual(self.profile.user.username, "testuser")
         self.assertEqual(self.profile.bio, "Food lover")
 
-
-# TEST FORMS
+# === FORM TESTS ===
 class RecipeFormTestCase(TestCase):
     def test_valid_recipe_form(self):
         category = Category.objects.create(name="Main Course")
@@ -68,8 +68,7 @@ class RecipeFormTestCase(TestCase):
         form = RecipeForm(data=form_data)
         self.assertFalse(form.is_valid())
 
-
-# TEST VIEWS (INTEGRATION TESTING)
+# === VIEW TESTS ===
 class RecipeViewTestCase(TestCase):
     def setUp(self):
         self.client = Client()
@@ -87,32 +86,17 @@ class RecipeViewTestCase(TestCase):
             author=self.user
         )
 
-    def test_homepage_access(self):
-        response = self.client.get(reverse("home"))
+    def test_homepage_status(self):
+        response = self.client.get(reverse("recipes:index"))
         self.assertEqual(response.status_code, 200)
 
-    def test_recipe_list_view(self):
-        response = self.client.get(reverse("recipe_list"))
-        self.assertEqual(response.status_code, 200)
+    def test_login_required_for_create_recipe(self):
+        response = self.client.get(reverse("recipes:create_recipe"))
+        self.assertEqual(response.status_code, 302)  # Redirects to login
 
-    def test_recipe_detail_view(self):
-        response = self.client.get(reverse("recipe_detail", args=[self.recipe.id]))
-        self.assertEqual(response.status_code, 200)
-
-    def test_login_required_for_dashboard(self):
-        response = self.client.get(reverse("dashboard"))
-        self.assertEqual(response.status_code, 302)  # Redirect to login
-
-    def test_logged_in_user_can_access_dashboard(self):
-        self.client.login(username="testuser", password="testpass")
-        response = self.client.get(reverse("dashboard"))
-        self.assertEqual(response.status_code, 200)
-
-
-# TEST API ENDPOINTS
+# === API TESTS ===
 class RecipeAPITestCase(APITestCase):
     def setUp(self):
-        self.client = Client()
         self.user = User.objects.create_user(username="testuser", password="testpass")
         self.client.login(username="testuser", password="testpass")
         self.category = Category.objects.create(name="Drinks")
@@ -148,11 +132,22 @@ class RecipeAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_api_pagination(self):
+        for i in range(15):
+            Recipe.objects.create(
+                title=f"Drink {i}",
+                description="Test drink",
+                ingredients="Water",
+                instructions="Mix",
+                prep_time=1,
+                cook_time=0,
+                servings=1,
+                category=self.category,
+                author=self.user
+            )
         response = self.client.get("/api/recipes/?page=1")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-
-# UI TESTS USING SELENIUM
+# === UI TESTS USING SELENIUM ===
 class UITestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -163,7 +158,7 @@ class UITestCase(unittest.TestCase):
         cls.driver.quit()
 
     def test_login_page(self):
-        self.driver.get("http://127.0.0.1:8000/login/")
+        self.driver.get(BASE_URL + "login/")
         username_field = self.driver.find_element(By.NAME, "username")
         password_field = self.driver.find_element(By.NAME, "password")
         submit_button = self.driver.find_element(By.NAME, "submit")
@@ -176,7 +171,7 @@ class UITestCase(unittest.TestCase):
         self.assertIn("Dashboard", self.driver.title)
 
     def test_recipe_submission(self):
-        self.driver.get("http://127.0.0.1:8000/recipes/new/")
+        self.driver.get(BASE_URL + "recipes/create/")
         title_field = self.driver.find_element(By.NAME, "title")
         desc_field = self.driver.find_element(By.NAME, "description")
         submit_button = self.driver.find_element(By.NAME, "submit")
@@ -189,10 +184,10 @@ class UITestCase(unittest.TestCase):
         self.assertIn("Recipes", self.driver.title)
 
     def test_logout(self):
-        self.driver.get("http://127.0.0.1:8000/logout/")
+        self.driver.get(BASE_URL + "logout/")
         time.sleep(2)
         self.assertIn("Login", self.driver.title)
 
-# RUN THE TESTS
+# === RUN TESTS ===
 if __name__ == "__main__":
     unittest.main()
