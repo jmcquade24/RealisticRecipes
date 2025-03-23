@@ -29,21 +29,20 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Authentication
-    path('recipes/', include('recipes.urls')),
-    path("accounts/signup/", views.register, name="signup"), 
+    path("accounts/signup/", views.register, name="signup"),
     path("accounts/login/", views.user_login, name="login"),
     path("accounts/logout/", views.user_logout, name="logout"),
     path("accounts/delete/", views.delete_account, name="delete_account"),
 
     # User Account Management
-    path("manage-account/", manage_account_view, name="manage_account"),
-    path("profile/", profile_view, name="profile"),
+    path("manage-account/", views.manage_account, name="manage_account"),
+    path("profile/", views.profile_view, name="profile"),
 
     # Password Management
     path('password_change/', auth_views.PasswordChangeView.as_view(), name='password_change'),
-    path('password_change_done/', auth_views.PasswordChangeDoneView.as_view(), name='password_change_done') 
-
+    path('password_change_done/', auth_views.PasswordChangeDoneView.as_view(), name='password_change_done')
 ]
+
 
 # Custom 404 Handler
 handler404 = "recipes.views.custom_404"
