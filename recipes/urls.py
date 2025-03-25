@@ -12,9 +12,15 @@ urlpatterns = [
     path("about/", views.about, name="about"),
 
     # Authentication
-    path("register", views.register, name="register"),
-    path("login/", views.user_login, name="login"),
+    path("register", views.register, name="register"),  
+    path("login/", views.user_login, name="login"),  
     path("logout/", views.user_logout, name="logout"),
+
+    #forgotten password     
+    path('password-reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
     # Recipe Management
     path("recipes/", views.recipes, name="recipes"),
@@ -37,22 +43,13 @@ urlpatterns = [
     path("popular/", views.popular_recipes, name="popular_recipes"),
     path("search/", views.search_recipes, name="search_recipes"),
 
+    #feedback  
+    path('feedback/', views.feedback, name='feedback'),
+
     # User Profiles
     path("profile/<str:username>/", views.user_profile, name="user_profile"),
     path("profile/<str:username>/manage-profile/", views.manage_account, name="manage_account"),
 
-    # Feedback
-    path("feedback/", views.feedback_view, name="feedback"),
-
-        # Authentication
-    path("accounts/signup/", views.register, name="signup"),
-    path("accounts/login/", views.user_login, name="login"),
-    path("accounts/logout/", views.user_logout, name="logout"),
-    path("accounts/delete/", views.delete_account, name="delete_account"),
-
-    # Password Management
-    path('password_change/', auth_views.PasswordChangeView.as_view(), name='password_change'),
-    path('password_change_done/', auth_views.PasswordChangeDoneView.as_view(), name='password_change_done')
 ]
 
 

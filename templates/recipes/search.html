@@ -1,0 +1,19 @@
+{% extends "recipes/base.html" %}
+{% load static %}
+
+<head>
+    {% block title %}Search{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4"></script>
+</head>
+    
+</head>
+
+{% block content %}
+
+    <h1>Search Recipes</h1>
+    <input id="searchbox" type="text" placeholder="Search for recipes..." />
+
+    <div id="hits"></div>
+    <script src="{% static 'js/search_config.js' %}"
+
+{% endblock %}

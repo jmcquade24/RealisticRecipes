@@ -4,5 +4,9 @@
 <h2>Profile</h2>
 <p><strong>Username:</strong> {{ user.username }}</p>
 <p><strong>Email:</strong> {{ user.email }}</p>
+<<<<<<< HEAD
 <a href="{% url 'recipes:manage_account' user.username %}">Manage Account</a>
+=======
+<a href="{% url 'recipes:manage_account' username=user.username %}">Manage Account</a>
+>>>>>>> 445d1aa725bff36d6dff69f435698190d91c5bc2
 {% endblock %}
