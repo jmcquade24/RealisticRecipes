@@ -7,6 +7,7 @@
 
     <!-- Edit Button (Visible only to the recipe author) -->
     {% if request.user == recipe.author %}
+        <a href="{% url 'recipes:delete_recipe' recipe.slug %}" class="btn-edit">Delete Recipe</a>
         <a href="{% url 'recipes:edit_recipe' recipe.slug %}" class="btn-edit">Edit Recipe</a>
     {% endif %}
 
@@ -82,7 +83,7 @@
         <button type="submit">Submit Review</button>
     </form>
     {% else %}
-    <p><a href="{% url 'accounts:login' %}">Log in</a> to leave a review.</p>
+    <p><a href="{% url 'recipes:login' %}">Log in</a> to leave a review.</p>
     {% endif %}
 </div>
 <!-- Include the external JavaScript file -->

@@ -25,11 +25,13 @@
         {% endfor %}
     </div>
 
+    {% if user.is_authenticated %}
     <h3>Add a Recipe</h3>
     <form method="post" action="{% url 'recipes:create_recipe' %}">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Add Recipe</button>
     </form>
+    {% endif %}
 </div>
 {% endblock %}

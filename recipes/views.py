@@ -7,6 +7,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.db.models import Q
 
+from algoliasearch_django import register
+from algoliasearch_django import save_record
+from recipes.models import Recipe
+from recipes.index import RecipeIndex
+
 from .forms import RecipeForm, UserUpdateForm, UserProfileForm, FeedbackForm, ProfilePictureForm
 from .models import Recipe, Review, Category, Like, UserProfile
 
@@ -30,7 +35,7 @@ def register(request):
         username = request.POST["username"]
         password = request.POST["password"]
         User.objects.create_user(username=username, password=password)
-        return redirect("login")
+        return redirect("recipes:login")
     return render(request, "recipes/register.html")
 
 def user_login(request):
@@ -40,7 +45,7 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
-            return redirect("index")
+            return redirect("recipes:index")
         return render(request, "recipes/login.html", {"error": "Invalid credentials"})
     return render(request, "recipes/login.html")
 
@@ -85,6 +90,7 @@ def create_recipe(request):
             recipe = form.save(commit=False)
             recipe.author = request.user
             recipe.save()
+            save_record(recipe)
             return redirect("recipes:view_recipe", slug=recipe.slug)
     else:
         form = RecipeForm()

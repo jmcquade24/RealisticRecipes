@@ -21,7 +21,7 @@
 
 <h3>Delete Account</h3>
 <p>Warning: Deleting your account is irreversible.</p>
-<form method="post" action="{% url 'delete_account' %}">
+<form method="post" action="{% url 'recipes:delete_account' %}">
     {% csrf_token %}
     <button type="submit" style="color: red;">Delete Account</button>
 </form>

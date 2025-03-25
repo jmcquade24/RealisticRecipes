@@ -1,6 +1,7 @@
 from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
+from django.contrib.auth import views as auth_views
 from . import views  # Use relative import for better modularity
 
 app_name = "recipes"
@@ -42,6 +43,16 @@ urlpatterns = [
 
     # Feedback
     path("feedback/", views.feedback_view, name="feedback"),
+
+        # Authentication
+    path("accounts/signup/", views.register, name="signup"),
+    path("accounts/login/", views.user_login, name="login"),
+    path("accounts/logout/", views.user_logout, name="logout"),
+    path("accounts/delete/", views.delete_account, name="delete_account"),
+
+    # Password Management
+    path('password_change/', auth_views.PasswordChangeView.as_view(), name='password_change'),
+    path('password_change_done/', auth_views.PasswordChangeDoneView.as_view(), name='password_change_done')
 ]
 
 

@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'recipes',
+    'recipes.apps.RecipesConfig',
+    'algoliasearch_django',
 ]
 
 MIDDLEWARE = [
@@ -71,6 +72,12 @@ TEMPLATES = [
         },
     },
 ]
+
+ALGOLIA = {
+        'APPLICATION_ID': '6RFFC8176O',
+        'API_KEY': '2c5f07a0be0b6a6f7ddfaaa263ad6474',
+        'SEARCH_API_KEY': '392c97f7418954752024680452574f5d',
+}
 
 WSGI_APPLICATION = 'RealisticRecipes.wsgi.application'
 

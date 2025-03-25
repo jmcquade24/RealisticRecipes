@@ -2,8 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.text import slugify
-import uuid
-
 
 # Create your models here.
 
@@ -31,7 +29,6 @@ class Recipe(models.Model):
     favorites = models.ManyToManyField(User, related_name="favorited_recipes", blank=True)
     slug = models.SlugField(unique=False, blank=True)
 
-
     def __str__(self):
         return self.title
 
@@ -39,6 +36,7 @@ class Recipe(models.Model):
         if not self.slug:  # Generate a slug if it doesn't exist
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
+
 
 class Rating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
