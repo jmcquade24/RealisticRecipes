@@ -1,6 +1,7 @@
 from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
+from django.contrib.auth import views as auth_views
 from . import views  # Use relative import for better modularity
 
 app_name = "recipes"
@@ -13,7 +14,13 @@ urlpatterns = [
     # Authentication
     path("register", views.register, name="register"),  
     path("login/", views.user_login, name="login"),  
-    path("logout/", views.user_logout, name="logout"), 
+    path("logout/", views.user_logout, name="logout"),
+
+    #forgotten password     
+    path('password-reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
     # Recipe Management
     path("recipes/", views.recipes, name="recipes"),
@@ -35,12 +42,12 @@ urlpatterns = [
     path("popular/", views.popular_recipes, name="popular_recipes"),
     path("search/", views.search_recipes, name="search_recipes"),
 
+    #feedback  
+    path('feedback/', views.feedback, name='feedback'),
+
     # User Profiles
     path("profile/<str:username>/", views.user_profile, name="user_profile"),
     path('profile/<str:username>/manage-profile/', views.manage_account, name='manage_account'),
-
-    # Feedback
-    path("feedback/", views.feedback_view, name="feedback"),
 
 ]
 

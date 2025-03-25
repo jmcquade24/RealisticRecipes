@@ -17,5 +17,5 @@
 {% endif %}
 
 <p>Don't have an account? <a href="{% url 'signup' %}">Sign up here</a></p>
-<p><a href="#">Forgot your password?</a></p>
+<p><a href="{% url 'recipes:password_reset' %}">Forgot Password?</a></p>
 {% endblock %}

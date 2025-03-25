@@ -6,6 +6,7 @@ from django.views.decorators.http import require_POST
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm 
 from django.db.models import Q
 
 from .forms import RecipeForm, UserUpdateForm, UserProfileForm, FeedbackForm, ProfilePictureForm
@@ -29,13 +30,28 @@ def about(request):
 # User Authentication
 def register(request):
     if request.method == "POST":
-    
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user = User.objects.create_user(username=username, password=password)
-        return redirect("login")
-    else:
-        return render(request, "recipes/register.html")
+        username = request.POST.get("username")
+        email = request.POST.get("email") 
+        password = request.POST.get("password")
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already taken. Choose another one.")
+            return redirect('recipes:register')
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already registered. Try logging in.")
+            return redirect('recipes:register')
+
+        user = User.objects.create_user(username=username, email=email, password=password)
+        user.save()
+
+        messages.success(request, "Account created successfully! You can now log in.")
+        return redirect('recipes:login')
+
+
+    form = UserCreationForm()
+
+    return render(request, 'recipes/register.html', {'form': form})
 
 def user_login(request):
     if request.method == "POST":
@@ -254,7 +270,8 @@ def search_recipes(request):
 def custom_404(request, exception):
     return render(request, "404.html", status=404)
 
-def feedback_view(request):
+@login_required
+def feedback(request):
     if request.method == "POST":
         form = FeedbackForm(request.POST)
         if form.is_valid():
@@ -329,3 +346,20 @@ def view_category(request, category_id):
     category = get_object_or_404(Category, id=category_id)
     recipes = Recipe.objects.filter(category=category)  
     return render(request, "recipes/view_category.html", {"category": category, "recipes": recipes})
+
+def forgot_password(request):
+    if request.method == "POST":
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            # Process the password reset
+            email = form.cleaned_data["email"]
+            associated_users = User.objects.filter(email=email)
+            if associated_users.exists():
+                for user in associated_users:
+                    # Generate password reset token and email it to the user
+                    # Password reset link will automatically go to password_reset_done
+                    pass
+            return redirect('password_reset_done') 
+    else:
+        form = PasswordResetForm()
+    return render(request, 'forgot_password.html', {'form': form})
