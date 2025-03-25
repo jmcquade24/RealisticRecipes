@@ -23,10 +23,10 @@
                 <li><a href="{% url 'recipes:logout' %}">Logout</a></li>
                 <li><a href="{% url 'recipes:manage_account' username=user.username %}">Manage Account</a></li>
                 <li><a href="{% url 'recipes:user_profile' username=user.username %}">Profile</a></li>
+                <li><a href="{% url 'recipes:feedback' %}">Feedback</a></li>
                 {% else %}
                 <li><a href="{% url 'recipes:login' %}">Login</a></li>
                 <li><a href="{% url 'recipes:register' %}">Register</a></li>
-                <li><a href="{% url 'recipes:feedback' %}">Feedback</a></li>
                 {% endif %}
             </ul>
         </nav>
