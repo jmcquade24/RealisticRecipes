@@ -33,13 +33,6 @@ def about(request):
 # User Authentication
 def register(request):
     if request.method == "POST":
-<<<<<<< HEAD
-        username = request.POST["username"]
-        password = request.POST["password"]
-        User.objects.create_user(username=username, password=password)
-        return redirect("recipes:login")
-    return render(request, "recipes/register.html")
-=======
         username = request.POST.get("username")
         email = request.POST.get("email") 
         password = request.POST.get("password")
@@ -62,7 +55,6 @@ def register(request):
     form = UserCreationForm()
 
     return render(request, 'recipes/register.html', {'form': form})
->>>>>>> 445d1aa725bff36d6dff69f435698190d91c5bc2
 
 def user_login(request):
     if request.method == "POST":
@@ -248,9 +240,6 @@ def user_profile(request, username):
 
 def recipes(request):
     recipes = Recipe.objects.all()
-<<<<<<< HEAD
-    return render(request, 'recipes/recipes.html', {'recipes': recipes})
-=======
     context = {
         'recipes': recipes,
     }
@@ -277,4 +266,3 @@ def forgot_password(request):
     else:
         form = PasswordResetForm()
     return render(request, 'forgot_password.html', {'form': form})
->>>>>>> 445d1aa725bff36d6dff69f435698190d91c5bc2
