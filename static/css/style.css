@@ -393,10 +393,12 @@ img {
     font-size: 1.1em;
 }
 
-/* Review Rating */
-#reviews li .rating {
-    color: #ff9800; /* Orange color for stars */
-    font-weight: bold;
+.star {
+    fill: #ffd700;
+    margin-right: 2px;
+}
+.star.empty {
+    fill: #ccc;
 }
 
 /* Review Comment */
