@@ -132,7 +132,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/home/2769579r/STATIC'
+STATIC_ROOT = '/home/2769579r/RealisticRecipes/STATIC'
 MEDIA_URL = '/media/'
 
 
