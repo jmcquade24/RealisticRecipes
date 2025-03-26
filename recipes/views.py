@@ -215,13 +215,15 @@ def view_categories(request):
         recipe_count=Count('recipe', distinct=True),
         total_likes=Count('recipe__likes', distinct=True)
     )
-    
-    if not request.user.is_staff:
+
+    if request.user.is_authenticated and not request.user.is_staff:
         categories = categories.filter(
             Q(is_approved=True) | 
             Q(created_by=request.user)
         ).distinct()
-    
+    elif not request.user.is_authenticated:
+        categories = categories.filter(is_approved=True)  
+
     context = {
         'categories': categories.order_by('-total_likes'),
         'can_add_category': request.user.is_authenticated,
