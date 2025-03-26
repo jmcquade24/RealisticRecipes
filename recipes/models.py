@@ -8,9 +8,44 @@ from django_resized import ResizedImageField
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
+    image = ResizedImageField(
+        upload_to='categories/',
+        size=[800, 600],
+        quality=85,
+        force_format='JPEG',
+        blank=True,
+        null=True
+    )
+    slug = models.SlugField(unique=False, blank=True)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='created_categories'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_approved = models.BooleanField(default=False)
+    approved_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='approved_categories'
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name_plural = "Categories"
+        ordering = ['-is_approved', 'name']
 
     def __str__(self):
-        return self.name
+        return f"{self.name} {'✓' if self.is_approved else '⏳'}"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+        
     
 class Recipe(models.Model):
     title = models.CharField(max_length=255)

@@ -1,11 +1,11 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, reverse
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm 
+from django.contrib.auth.forms import UserCreationForm
 from django.db.models import Q
 from .models import Recipe, Category, Like
 from django.db.models import Count, Avg
@@ -13,16 +13,20 @@ from django.utils import timezone
 from datetime import timedelta
 from django.core.paginator import Paginator
 from django.core.cache import cache
-
-
+from django.views.generic import CreateView, UpdateView
+from django.contrib import messages
 
 from algoliasearch_django import register
 from algoliasearch_django import save_record
 from recipes.models import Recipe
 from recipes.index import RecipeIndex
 
-from .forms import RecipeForm, UserUpdateForm, UserProfileForm, FeedbackForm, ProfilePictureForm
+from .forms import RecipeForm, UserUpdateForm, UserProfileForm, FeedbackForm, ProfilePictureForm, CategoryForm, CategoryApprovalForm
 from .models import Recipe, Review, Category, Like, UserProfile
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.decorators import method_decorator
+
+
 
 def index(request):
     categories = Category.objects.all()
@@ -202,22 +206,51 @@ def view_favorites(request):
     favorites = request.user.favorites.all()
     return render(request, 'recipes/favorites.html', {'favorites': favorites})
 
-# Categories
 def view_categories(request):
     categories = Category.objects.annotate(
-        total_likes=Count('recipe__likes')
-    ).order_by('-total_likes')
-    return render(request, 'recipes/categories.html', {'categories': categories})
+        recipe_count=Count('recipe', distinct=True),
+        total_likes=Count('recipe__likes', distinct=True)
+    )
+    
+    if not request.user.is_staff:
+        categories = categories.filter(
+            Q(is_approved=True) | 
+            Q(created_by=request.user)
+        ).distinct()
+    
+    context = {
+        'categories': categories.order_by('-total_likes'),
+        'can_add_category': request.user.is_authenticated,
+        'pending_count': categories.filter(is_approved=False).count() if request.user.is_staff else 0
+    }
+    return render(request, 'recipes/categories.html', context)
 
 def view_category(request, category_id):
-    category = get_object_or_404(Category, id=category_id)
+    category = get_object_or_404(
+        Category.objects.annotate(
+            recipe_count=Count('recipe'),
+            total_likes=Count('recipe__likes')
+        ), 
+        id=category_id
+    )
+    
     recipes = Recipe.objects.filter(category=category).annotate(
         like_count=Count('likes')
-    ).order_by('-like_count')    
-    return render(request, "recipes/view_category.html", {
+    ).order_by('-like_count')
+    
+    context = {
         "category": category,
-        "recipes": recipes
-        })
+        "recipes": recipes,
+        "can_edit_category": request.user.is_staff  # Edit permission check
+    }
+    return render(request, "recipes/view_category.html", context)
+
+def category_list(request):
+    categories = Category.objects.annotate(
+        recipe_count=Count('recipe'),
+        total_likes=Count('recipe__likes')
+    )
+    return render(request, 'categories.html', {'categories': categories})
 
 # Popular Recipes
 def popular_recipes(request):
@@ -334,3 +367,68 @@ def forgot_password(request):
     else:
         form = PasswordResetForm()
     return render(request, 'forgot_password.html', {'form': form})
+
+@method_decorator(login_required, name='dispatch')
+class CategoryCreateView(CreateView):
+    model = Category
+    form_class = CategoryForm
+    template_name = 'recipes/category_form.html'
+    
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        if self.request.user.is_staff:
+            form.instance.is_approved = True
+            form.instance.approved_by = self.request.user
+            messages.success(self.request, f'Category "{form.instance.name}" created and approved!')
+        else:
+            messages.success(self.request, 
+                f'Category "{form.instance.name}" submitted for admin approval. '
+                'It is visible only to you until approved.'
+            )
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('recipes:view_categories')
+
+@method_decorator(login_required, name='dispatch')
+class CategoryUpdateView(UpdateView):
+    model = Category
+    form_class = CategoryForm
+    template_name = 'recipes/category_form.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if not (request.user.is_staff or obj.created_by == request.user):
+            messages.error(request, "You can only edit categories you created")
+            return redirect('recipes:view_category', category_id=obj.id)
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_success_url(self):
+        return reverse('recipes:view_categories')
+    
+@staff_member_required
+def pending_categories(request):
+    pending = Category.objects.filter(is_approved=False).order_by('created_at')
+    return render(request, 'recipes/pending_categories.html', {
+        'pending_categories': pending
+    })
+
+@staff_member_required
+def approve_category(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == 'POST':
+        form = CategoryApprovalForm(request.POST, instance=category)
+        if form.is_valid():
+            category = form.save(commit=False)
+            category.approved_by = request.user
+            category.approved_at = timezone.now()
+            category.save()
+            messages.success(request, f'Category "{category.name}" approved!')
+            return redirect('recipes:pending_categories')
+    else:
+        form = CategoryApprovalForm(instance=category)
+    
+    return render(request, 'recipes/approve_category.html', {
+        'form': form,
+        'category': category
+    })

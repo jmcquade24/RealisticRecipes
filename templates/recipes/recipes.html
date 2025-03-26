@@ -5,6 +5,14 @@
 
 {% block content %}
 <div class="recipes-container">
+
+    {% if user.is_authenticated %}
+        <form method="post" action="{% url 'recipes:create_recipe' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-submit">Add a Recipe</button>
+        </form>
+    {% endif %}
     <!-- Popular Recipes Section -->
     {% if popular_recipes %}
     <section class="section">

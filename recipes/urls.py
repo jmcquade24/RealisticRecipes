@@ -38,7 +38,12 @@ urlpatterns = [
     # Categories
     path("categories/", views.view_categories, name="view_categories"),
     path("category/<int:category_id>/", views.view_category, name="view_category"),
+    path('categories/add/', views.CategoryCreateView.as_view(), name='category_create'),
+    path('categories/<int:pk>/edit/', views.CategoryUpdateView.as_view(), name='category_update'),
+    path('categories/pending/', views.pending_categories, name='pending_categories'),
+    path('categories/<int:pk>/approve/', views.approve_category, name='approve_category'),
 
+    
     # Popular & Search
     path("popular/", views.popular_recipes, name="popular_recipes"),
     path("search/", views.search_recipes, name="search_recipes"),

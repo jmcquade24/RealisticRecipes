@@ -1,0 +1,43 @@
+{% load static %}
+<div class="category-card-wrapper">
+    <div class="category-card">
+        {% if not category.is_approved %}
+        <div class="approval-badge">
+            <i class="fas fa-clock"></i> Pending Approval
+        </div>
+        {% endif %}
+        {% if category.image %}
+            <img src="{{ category.image.url }}" 
+                 alt="{{ category.name }}" 
+                 class="category-image">
+        {% else %}
+            <img src="{% static 'images/default-category.jpg' %}" 
+                 alt="Default Category Image" 
+                 class="category-image">
+        {% endif %}
+        
+        <div class="category-details">
+            <h3>
+                <a href="{% url 'recipes:view_category' category.id %}">
+                    {{ category.name }}
+                </a>
+            </h3>
+            
+            <div class="category-meta">
+                <span class="recipes-count">
+                    <i class="fas fa-utensils"></i> {{ category.recipe_count }} recipes
+                </span>
+                <span class="likes">
+                    <i class="fas fa-heart"></i> {{ category.total_likes }} likes
+                </span>
+            </div>
+            
+            <div class="category-actions">
+                <a href="{% url 'recipes:view_category' category.id %}" 
+                   class="btn-view">
+                    Browse Recipes
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

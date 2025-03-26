@@ -1,0 +1,28 @@
+{% extends "recipes/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h2 class="page-title">Pending Category Approvals</h2>
+    
+    {% if pending_categories %}
+    <div class="pending-list">
+        {% for category in pending_categories %}
+        <div class="pending-item">
+            <div class="pending-info">
+                <h3>{{ category.name }}</h3>
+                <p>Created by: {{ category.created_by.username }}</p>
+                <p>Submitted: {{ category.created_at|timesince }} ago</p>
+            </div>
+            <a href="{% url 'recipes:approve_category' category.pk %}" 
+               class="btn-edit">
+                Review
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-message">No pending categories for approval!</p>
+    {% endif %}
+</div>
+{% endblock %}
