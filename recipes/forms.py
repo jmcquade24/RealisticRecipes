@@ -63,3 +63,34 @@ class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
         fields = ['rating', 'comment']
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name', 'image']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter category name'
+            }),
+            'image': forms.FileInput(attrs={
+                'class': 'form-control-file',
+                'accept': 'image/*'
+            })
+        }
+        labels = {
+            'image': 'Category Image (800x600 recommended)'
+        }
+        help_texts = {
+            'image': 'Upload an image that represents this food category'
+        }
+
+class CategoryApprovalForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['is_approved']
+        widgets = {
+            'is_approved': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            })
+        }

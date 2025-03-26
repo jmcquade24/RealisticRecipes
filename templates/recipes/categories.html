@@ -1,26 +1,39 @@
 {% extends "recipes/base.html" %}
-{% block title %}Categories Page{% endblock %}
-{% block content %}
-<h2>Categories Page</h2>
-<section>
-    <h3>Popular Recipes</h3>
-    <ul>
-        {% for recipe in popular_recipes %}
-            <li>{{ recipe.name }} - <a href="{% url 'recipes:view_recipe' recipe.slug %}">View</a></li>
-        {% empty %}
-            <p>No popular recipes available.</p>
-        {% endfor %}
-    </ul>
-</section>
-<section>
-    <h3>New Recipes</h3>
-    <ul>
-        {% for recipe in new_recipes %}
-            <li>{{ recipe.name }} - <a href="{% url 'recipes:view_recipe' recipe.title %}">View</a></li>
-        {% empty %}
-            <p>No new recipes available.</p>
-        {% endfor %}
-    </ul>
-</section>
-{% endblock %}
+{% load static %}
 
+{% block content %}
+<div class="recipes-container">
+    <h2 class="page-title">All Recipe Categories</h2>
+    
+    {% if pending_count > 0 and request.user.is_staff %}
+    <div class="admin-alert">
+        <i class="fas fa-exclamation-circle"></i>
+        You have {{ pending_count }} categories awaiting approval.
+        <a href="{% url 'recipes:pending_categories' %}">Review now</a>
+    </div>
+    {% endif %}
+    
+    {% if can_add_category %}
+    <div class="text-center mb-4">
+        <a href="{% url 'recipes:category_create' %}" class="btn-submit">
+            <i class="fas fa-plus"></i> Create New Category
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="category-grid">
+        {% for category in categories %}
+            {% include 'recipes/partials/category_card.html' %}
+        {% empty %}
+            <div class="empty-message">
+                <p>No categories found.</p>
+                {% if can_add_category %}
+                <a href="{% url 'recipes:category_create' %}" class="btn-submit">
+                    Create First Category
+                </a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

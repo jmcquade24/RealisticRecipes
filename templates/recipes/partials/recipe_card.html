@@ -1,0 +1,38 @@
+{% load static %}
+<div class="recipe-card-wrapper">
+    <div class="recipe-card">
+        {% if recipe.image %}
+            <img src="{{ recipe.image.url }}" 
+                 alt="{{ recipe.title }}" 
+                 class="recipe-image">
+        {% else %}
+            <img src="{% static 'images/default-recipe.jpg' %}" 
+                 alt="Default Recipe Image" 
+                 class="recipe-image">
+        {% endif %}
+        
+        <div class="recipe-details">
+            <h4>{{ recipe.title }}</h4>
+            
+            <div class="recipe-meta">
+                <span class="category">
+                    <i class="fas fa-tag"></i> {{ recipe.category.name }}
+                </span>
+                <span class="likes">
+                    <i class="fas fa-heart"></i> {{ recipe.likes.count }}
+                </span>
+            </div>
+            
+            <p class="recipe-description">
+                {{ recipe.description|truncatechars:100 }}
+            </p>
+            
+            <div class="recipe-actions">
+                <a href="{% url 'recipes:view_recipe' recipe.slug %}" 
+                   class="btn-view">
+                    View Recipe
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

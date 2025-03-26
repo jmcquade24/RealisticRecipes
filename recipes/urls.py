@@ -38,7 +38,12 @@ urlpatterns = [
     # Categories
     path("categories/", views.view_categories, name="view_categories"),
     path("category/<int:category_id>/", views.view_category, name="view_category"),
+    path('categories/add/', views.CategoryCreateView.as_view(), name='category_create'),
+    path('categories/<int:pk>/edit/', views.CategoryUpdateView.as_view(), name='category_update'),
+    path('categories/pending/', views.pending_categories, name='pending_categories'),
+    path('categories/<int:pk>/approve/', views.approve_category, name='approve_category'),
 
+    
     # Popular & Search
     path("popular/", views.popular_recipes, name="popular_recipes"),
     path("search/", views.search_recipes, name="search_recipes"),
@@ -57,8 +62,10 @@ urlpatterns = [
     path("accounts/delete/", views.delete_account, name="delete_account"),
 
     # Password Management
-    path('password_change/', auth_views.PasswordChangeView.as_view(), name='password_change'),
-    path('password_change_done/', auth_views.PasswordChangeDoneView.as_view(), name='password_change_done')
+    path('password-reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 ]
 
 

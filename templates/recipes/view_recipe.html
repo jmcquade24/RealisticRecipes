@@ -3,21 +3,22 @@
 
 {% block content %}
 <div class="container">
-    <h1>{{ recipe.title }}</h1>
-
-    <!-- Edit Button (Visible only to the recipe author) -->
-    {% if request.user == recipe.author %}
+    <h1 class="page-title">{{ recipe.title }}</h1>
+    <div class="buttons">
+        <!-- Edit Button (Visible only to the recipe author) -->
+        {% if request.user == recipe.author %}
         <a href="{% url 'recipes:delete_recipe' recipe.slug %}" class="btn-edit">Delete Recipe</a>
         <a href="{% url 'recipes:edit_recipe' recipe.slug %}" class="btn-edit">Edit Recipe</a>
-    {% endif %}
-
-    <!-- Recipe Image -->
-    {% if recipe.image %}
+        {% endif %}
+    </div>
+    <div class="img">
+        <!-- Recipe Image -->
+        {% if recipe.image %}
         <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
-    {% else %}
+        {% else %}
         <img src="{% static 'images/default-recipe.jpg' %}" alt="Default Recipe Image">
-    {% endif %}
-
+        {% endif %}
+    </div>
     <div class="recipe-info">
         <!-- Basic Recipe Information -->
         <p><strong>Author:</strong> {{ recipe.author.username }}</p>
@@ -38,7 +39,7 @@
         <p><strong>Created At:</strong> {{ recipe.created_at }}</p>
         <p><strong>Last Updated:</strong> {{ recipe.updated_at }}</p>
     </div>
-    
+
     <!-- Like Button -->
     <button id="like-btn" data-slug="{{ recipe.slug }}">
         {% if request.user in recipe.likes.all %}Unlike{% else %}Like{% endif %}
@@ -48,7 +49,7 @@
     <!-- Favorite Button -->
     <button id="favorite-btn" data-slug="{{ recipe.slug }}">
         &#10084; Favorite (<span id="favorite-status">
-        {% if request.user in recipe.favorites.all %}Added{% else %}Add{% endif %}
+            {% if request.user in recipe.favorites.all %}Added{% else %}Add{% endif %}
         </span>)
     </button>
 
@@ -56,21 +57,20 @@
     <h3>Reviews</h3>
     <ul id="reviews">
         {% for review in recipe.review_set.all %}
-            <li>
-                <strong>{{ review.user.username }}</strong>
-                <span class="rating">
-                    {% for i in "12345" %}
-                        {% if i|add:0 <= review.rating %}
-                            <i class="fas fa-star"></i> <!-- Filled star -->
-                        {% else %}
-                            <i class="far fa-star"></i> <!-- Empty star -->
-                        {% endif %}
+        <li>
+            <strong>{{ review.user.username }}</strong>
+            <span class="rating">
+                {% for i in "12345" %}
+                {% if i|add:0 <= review.rating %} <i class="fas fa-star"></i> <!-- Filled star -->
+                    {% else %}
+                    <i class="far fa-star"></i> <!-- Empty star -->
+                    {% endif %}
                     {% endfor %}
-                </span>
-                <p class="comment">{{ review.comment }}</p>
-            </li>
+            </span>
+            <p class="comment">{{ review.comment }}</p>
+        </li>
         {% empty %}
-            <li>No reviews yet. Be the first to review!</li>
+        <li>No reviews yet. Be the first to review!</li>
         {% endfor %}
     </ul>
 

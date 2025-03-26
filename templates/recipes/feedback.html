@@ -1,10 +1,22 @@
 {% extends "recipes/base.html" %}
+{% load static %}
 {% block title %}Feedback{% endblock %}
 {% block content %}
-<h2>Feedback</h2>
-<form method="post">
-    {% csrf_token %}
-    <textarea name="feedback" rows="5" cols="40" placeholder="Enter your feedback..."></textarea>
-    <button type="submit">Submit</button>
-</form>
+<div class="container feedback-page">
+    <h2 class="page-title">Send Us Feedback</h2>
+    <p class="feedback-description">We'd love to hear your thoughts about Realistic Recipes!</p>
+    
+    <form method="post" class="feedback-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="message">Your Feedback</label>
+            <textarea name="message" id="message" rows="6" placeholder="What do you like? What can we improve?"></textarea>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">Send Feedback</button>
+            <a href="{% url 'recipes:index' %}" class="btn-cancel">Cancel</a>
+        </div>
+    </form>
+</div>
 {% endblock %}

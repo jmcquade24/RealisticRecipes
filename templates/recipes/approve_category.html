@@ -1,0 +1,30 @@
+{% extends "recipes/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h2 class="page-title">Review Category: {{ category.name }}</h2>
+    
+    <div class="approval-card">
+        {% if category.image %}
+        <img src="{{ category.image.url }}" 
+             alt="{{ category.name }}" 
+             class="approval-image">
+        {% endif %}
+        
+        <form method="post" class="approval-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    {{ category.is_approved|yesno:"Update,Approve" }}
+                </button>
+                <a href="{% url 'recipes:pending_categories' %}" 
+                   class="btn-cancel">
+                    Back to List
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
