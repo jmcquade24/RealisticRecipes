@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container">
-    <h1>{{ recipe.title }}</h1>
+    <h1  class="page-title">{{ recipe.title }}</h1>
 
     <!-- Edit Button (Visible only to the recipe author) -->
     {% if request.user == recipe.author %}

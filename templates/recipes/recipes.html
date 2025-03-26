@@ -1,49 +1,94 @@
 {% extends "recipes/base.html" %}
 {% load static %}
+
 {% block title %}All Recipes{% endblock %}
+
 {% block content %}
-<div class="container recipes-page">
-    <h2 class="page-title">Discover Recipes</h2>
-    
-    <section class="popular-section">
-        <h3>🔥 Popular Recipes</h3>
+<div class="recipes-container">
+    <!-- Popular Recipes Section -->
+    {% if popular_recipes %}
+    <section class="section">
+        <h3 class="section-title">
+            <i class="fas fa-fire"></i> Popular Recipes
+        </h3>
         <div class="recipe-grid">
             {% for recipe in popular_recipes %}
-            <div class="recipe-card">
-                {% if recipe.image %}
-                    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-image">
-                {% else %}
-                    <img src="{% static 'images/default-recipe.jpg' %}" alt="Default Recipe Image" class="recipe-image">
-                {% endif %}
-                <div class="recipe-details">
-                    <h4>{{ recipe.title }}</h4>
-                    <p class="likes">👍 {{ recipe.like_count }} likes</p>
-                    <a href="{% url 'recipes:view_recipe' recipe.slug %}" class="btn-view">View Recipe</a>
-                </div>
-            </div>
+                {% include 'recipes/partials/recipe_card.html' %}
             {% endfor %}
         </div>
     </section>
+    {% endif %}
 
-    <section class="new-section">
-        <h3>✨ New Recipes</h3>
+    <!-- New Recipes Section -->
+    {% if new_recipes %}
+    <section class="section">
+        <h3 class="section-title">
+            <i class="fas fa-star"></i> New Recipes
+        </h3>
         <div class="recipe-grid">
             {% for recipe in new_recipes %}
-            <div class="recipe-card">
-                {% if recipe.image %}
-                    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe-image">
-                {% else %}
-                    <img src="{% static 'images/default-recipe.jpg' %}" alt="Default Recipe Image" class="recipe-image">
-                {% endif %}
-                <div class="recipe-details">
-                    <h4>{{ recipe.title }}</h4>
-                    <p class="date">Posted {{ recipe.created_at|timesince }} ago</p>
-                    <a href="{% url 'recipes:view_recipe' recipe.slug %}" class="btn-view">View Recipe</a>
-                </div>
-            </div>
+                {% include 'recipes/partials/recipe_card.html' %}
             {% endfor %}
         </div>
     </section>
-    
+    {% endif %}
+
+    <!-- All Recipes Section -->
+    <section class="section">
+        <h3 class="section-title">
+            <i class="fas fa-utensils"></i> All Recipes
+        </h3>
+        
+        <!-- Per Page Selector -->
+        <div class="per-page-selector">
+            <span>Show:</span>
+            <a href="?per_page=12{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
+               class="{% if per_page == 12 %}active{% endif %}">12</a>
+            <a href="?per_page=24{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
+               class="{% if per_page == 24 %}active{% endif %}">24</a>
+            <a href="?per_page=48{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}" 
+               class="{% if per_page == 48 %}active{% endif %}">48</a>
+        </div>
+        
+        <!-- Recipe Grid -->
+        <div class="recipe-grid">
+            {% for recipe in page_obj %}
+                {% include 'recipes/partials/recipe_card.html' %}
+            {% empty %}
+                <div class="empty-message">
+                    No more recipes found. 
+                    <a href="{% url 'recipes:create_recipe' %}">Create one?</a>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1&per_page={{ per_page }}" class="page-link">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}&per_page={{ per_page }}" 
+                   class="page-link">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            {% endif %}
+            
+            <span class="current-page">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&per_page={{ per_page }}" 
+                   class="page-link">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}&per_page={{ per_page }}" 
+                   class="page-link">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            {% endif %}
+        </div>
+    </section>
 </div>
 {% endblock %}

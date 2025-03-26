@@ -1,6 +1,14 @@
 {% extends 'recipes/base.html' %}
+{% load static %}
 {% block title %}About Page{% endblock %}
 {% block content %}
-    <h2>About Us</h2>
-    <p>Information about Realistic Recipes</p>
+<div class="about-page">
+    <h2 class="page-title">
+        <i class="fas fa-info-circle"></i> About Realistic Recipes
+    </h2>
+    
+    <div class="about-content">
+        <p class="intro">About us...</p>
+    </div>
+</div>
 {% endblock %}

@@ -2,36 +2,32 @@
 {% load static %}
 {% block title %}Homepage{% endblock %}
 {% block content %}
-<h2>Welcome to the Realistic Recipes</h2>
-<p>Discover new recipes and share your own!</p>
+<div class="recipes-container">
+    <h2 class="page-title">Welcome to Realistic Recipes</h2>
+    <p class="page-title">Discover new recipes and share your own!</p>
 
-<div class="container">
-    <div class="featured">
-        <h2>Featured Recipes</h2>
-        <div class="recipe-list">
+    {% if featured_recipes %}
+    <section class="section">
+        <h3 class="section-title">
+            <i class="fas fa-star"></i> Featured Recipes
+        </h3>
+        <div class="recipe-grid">
             {% for recipe in featured_recipes %}
-            <div class="recipe-card">
-                {% if recipe.image %}
-                    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
-                {% else %}
-                    <img src="{% static 'images/default-recipe.jpg' %}" alt="Default Recipe Image">
-                {% endif %}
-                    <h3>{{ recipe.title }}</h3>
-                    <p>{{ recipe.description }}</p>
-                    <a href="{% url 'recipes:view_recipe' recipe.slug %}" class="btn-view">View Recipe</a>
-            </div>
+                {% include 'recipes/partials/recipe_card.html' %}
             {% endfor %}
         </div>
-    </div>
+    </section>
+    {% endif %}
 
-    <div class="categories">
-        <h2>Top Categories</h2>
+    <section class="section">
+        <h3 class="section-title">
+            <i class="fas fa-tags"></i> Top Categories
+        </h3>
         <ul class="category-list">
             {% for category in top_categories %}
             <li><a href="{% url 'recipes:view_category' category.id %}">{{ category.name }}</a></li>
             {% endfor %}
         </ul>
-    </div>
-</div>
+    </section>
 </div>
 {% endblock %}

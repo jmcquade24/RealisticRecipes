@@ -12,6 +12,8 @@ from django.db.models import Count, Avg
 from django.utils import timezone
 from datetime import timedelta
 from django.core.paginator import Paginator
+from django.core.cache import cache
+
 
 
 from algoliasearch_django import register
@@ -22,7 +24,6 @@ from recipes.index import RecipeIndex
 from .forms import RecipeForm, UserUpdateForm, UserProfileForm, FeedbackForm, ProfilePictureForm
 from .models import Recipe, Review, Category, Like, UserProfile
 
-# Home page
 def index(request):
     categories = Category.objects.all()
     # 1. Automatically feature top-rated recipes (avg rating + number of ratings)
@@ -267,18 +268,42 @@ def user_profile(request, username):
     return render(request, 'recipes/profile.html', context)
 
 def recipes(request):
-    all_recipes = Recipe.objects.all().order_by('-created_at')
-    paginator = Paginator(all_recipes, 12)  # 12 per page
+    # Cache popular recipes for 1 hour
+    popular_recipes = cache.get('popular_recipes')
+    if not popular_recipes:
+        popular_recipes = Recipe.objects.annotate(
+            like_count=Count('likes')
+        ).select_related('author', 'category').order_by(
+            '-like_count'
+        )[:6]
+        cache.set('popular_recipes', popular_recipes, 3600)
     
+    # Cache new recipes for 1 hour
+    new_recipes = cache.get('new_recipes')
+    if not new_recipes:
+        new_recipes = Recipe.objects.select_related(
+            'author', 'category'
+        ).order_by('-created_at')[:6]
+        cache.set('new_recipes', new_recipes, 3600)
+    
+    # Get IDs to exclude
+    exclude_ids = [r.id for r in popular_recipes] + [r.id for r in new_recipes]
+    
+    # Main query with pagination
+    all_recipes = Recipe.objects.exclude(
+        id__in=exclude_ids
+    ).select_related('author', 'category').order_by('-created_at')
+    
+    per_page = int(request.GET.get('per_page', 12))
+    paginator = Paginator(all_recipes, per_page)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
     context = {
         'page_obj': page_obj,
-        'popular_recipes': Recipe.objects.annotate(
-        like_count=Count('likes')
-    ).order_by('-like_count')[:6],
-        'new_recipes': Recipe.objects.order_by('-created_at')[:6]
+        'popular_recipes': popular_recipes,
+        'new_recipes': new_recipes,
+        'per_page': per_page,
     }
     return render(request, 'recipes/recipes.html', context)
 
