@@ -7,6 +7,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm 
 from django.db.models import Q
+from .models import Recipe, Category, Like
+from django.db.models import Count, Avg
+from django.utils import timezone
+from datetime import timedelta
+from django.core.paginator import Paginator
+
 
 from algoliasearch_django import register
 from algoliasearch_django import save_record
@@ -19,8 +25,19 @@ from .models import Recipe, Review, Category, Like, UserProfile
 # Home page
 def index(request):
     categories = Category.objects.all()
-    featured_recipes = Recipe.objects.filter(is_featured=True)[:3]
-    top_categories = Category.objects.all()[:3]
+    # 1. Automatically feature top-rated recipes (avg rating + number of ratings)
+    featured_recipes = Recipe.objects.annotate(
+        avg_rating=Avg('review__rating'),
+        rating_count=Count('review')
+    ).filter(
+        rating_count__gte=3  # Only consider recipes with at least 3 ratings
+    ).order_by('-avg_rating', '-rating_count')[:3]
+    
+    # 2. Top categories by most liked recipes in those categories
+    top_categories = Category.objects.annotate(
+        total_likes=Count('recipe__likes')
+    ).order_by('-total_likes')[:6]
+    
     return render(request, 'recipes/index.html', {
         "categories": categories,
         'featured_recipes': featured_recipes,
@@ -186,13 +203,20 @@ def view_favorites(request):
 
 # Categories
 def view_categories(request):
-    categories = Category.objects.all()
+    categories = Category.objects.annotate(
+        total_likes=Count('recipe__likes')
+    ).order_by('-total_likes')
     return render(request, 'recipes/categories.html', {'categories': categories})
 
 def view_category(request, category_id):
     category = get_object_or_404(Category, id=category_id)
-    recipes = Recipe.objects.filter(category=category)
-    return render(request, "recipes/view_category.html", {"category": category, "recipes": recipes})
+    recipes = Recipe.objects.filter(category=category).annotate(
+        like_count=Count('likes')
+    ).order_by('-like_count')    
+    return render(request, "recipes/view_category.html", {
+        "category": category,
+        "recipes": recipes
+        })
 
 # Popular Recipes
 def popular_recipes(request):
@@ -229,21 +253,40 @@ def feedback(request):
 
 @login_required
 def user_profile(request, username):
-    user = get_object_or_404(User, username=username)
-    recipes = Recipe.objects.filter(author=user).select_related('author')
-    liked_recipes = user.liked_recipes.all().select_related('author')
-    return render(request, 'recipes/profile.html', {
-        'profile_user': user,
-        'recipes': recipes,
-        'liked_recipes': liked_recipes
-    })
+    profile_user = get_object_or_404(User, username=username)
+    
+    context = {
+        'profile_user': profile_user,
+        'created_recipes': Recipe.objects.filter(author=profile_user)
+                              .select_related('category')
+                              .order_by('-created_at'),
+        'favorited_recipes': Recipe.objects.filter(favorites=profile_user)
+                               .select_related('category', 'author')
+                               .order_by('-created_at')
+    }
+    return render(request, 'recipes/profile.html', context)
 
 def recipes(request):
-    recipes = Recipe.objects.all()
+    all_recipes = Recipe.objects.all().order_by('-created_at')
+    paginator = Paginator(all_recipes, 12)  # 12 per page
+    
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     context = {
-        'recipes': recipes,
+        'page_obj': page_obj,
+        'popular_recipes': Recipe.objects.annotate(
+        like_count=Count('likes')
+    ).order_by('-like_count')[:6],
+        'new_recipes': Recipe.objects.order_by('-created_at')[:6]
     }
     return render(request, 'recipes/recipes.html', context)
+
+def popular_recipes(request):
+    popular_recipes = Recipe.objects.annotate(
+    recent_likes=Count('likes', filter=Q(likes__created_at__gte=timezone.now()-timedelta(days=30)))
+).order_by('-recent_likes')[:6]
+    return render(request, "recipes/popular.html", {"popular": popular})
 
 def view_category(request, category_id):
     category = get_object_or_404(Category, id=category_id)

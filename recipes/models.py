@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.text import slugify
+from django_resized import ResizedImageField
 
 # Create your models here.
 
@@ -20,7 +21,14 @@ class Recipe(models.Model):
     cook_time = models.PositiveIntegerField()
     servings = models.PositiveIntegerField()
     is_featured = models.BooleanField(default=False)
-    image = models.ImageField(upload_to='recipes/', blank=True, null=True)
+    image = ResizedImageField(
+            upload_to='recipes/',
+            size=[800, 600],  
+            quality=85,
+            force_format='JPEG',
+            blank=True,
+            null=True
+        )    
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

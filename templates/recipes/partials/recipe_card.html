@@ -1,0 +1,28 @@
+{% load static %}
+
+<div class="recipe-card">
+    {% if recipe.image %}
+        <img src="{{ recipe.image.url }}" 
+             alt="{{ recipe.title }}" 
+             class="recipe-image">
+    {% else %}
+        <img src="{% static 'images/default-recipe.jpg' %}" 
+             alt="Default Recipe Image" 
+             class="recipe-image">
+    {% endif %}
+    <div class="recipe-details">
+        <h4>{{ recipe.title }}</h4>
+        <div class="recipe-meta">
+            <span class="category">{{ recipe.category.name }}</span>
+            <span class="likes">❤️ {{ recipe.likes.count }}</span>
+        </div>
+        <div class="recipe-actions">
+            <a href="{% url 'recipes:view_recipe' recipe.slug %}" 
+               class="btn-view">View Recipe</a>
+            {% if user == recipe.author %}
+                <a href="{% url 'recipes:edit_recipe' recipe.slug %}" 
+                   class="btn-edit">Edit</a>
+            {% endif %}
+        </div>
+    </div>
+</div>

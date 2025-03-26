@@ -1,29 +1,63 @@
 {% extends "recipes/base.html" %}
+{% load static %}
 {% block title %}Manage Account{% endblock %}
 {% block content %}
-<h2>Manage Account</h2>
+<div class="container account-management">
+    <h2 class="page-title">Manage Your Account</h2>
+    
+    <div class="account-section">
+        <h3>Account Information</h3>
+        <form method="post" enctype="multipart/form-data" class="account-form">
+            {% csrf_token %}
+            
+            <!-- Profile Picture Section -->
+            <div class="profile-picture-section">
+                <div class="current-picture">
+                    {% if request.user.userprofile.profile_picture %}
+                        <img src="{{ request.user.userprofile.profile_picture.url }}" alt="Current Profile Picture" class="profile-pic-preview">
+                    {% else %}
+                        <img src="{% static 'images/default-profile.jpg' %}" alt="Default Profile" class="profile-pic-preview">
+                    {% endif %}
+                </div>
+                <div class="picture-upload">
+                    <label for="id_profile_picture">Update Profile Picture:</label>
+                    {{ profile_picture_form.profile_picture }}
+                    <small class="form-text">Recommended size: 200x200 pixels</small>
+                </div>
+            </div>
+            
+            <!-- Account Info Fields -->
+            <div class="form-grid">
+                {% for field in form %}
+                    {% if field.name != 'profile_picture' %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="form-help">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="form-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Save Changes</button>
+                <a href="{% url 'recipes:user_profile' username=request.user.username %}" class="btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Update Account</button>
-</form>
-
-<hr>
-
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ profile_picture_form.as_p }}
-    <button type="submit">Update Profile Picture</button>
-</form>
-
-<hr>
-
-<h3>Delete Account</h3>
-<p>Warning: Deleting your account is irreversible.</p>
-<form method="post" action="{% url 'recipes:delete_account' %}">
-    {% csrf_token %}
-    <button type="submit" style="color: red;">Delete Account</button>
-</form>
-
+    <div class="account-section danger-zone">
+        <h3>Delete Account</h3>
+        <p class="warning">Warning: This action cannot be undone. All your data will be permanently deleted.</p>
+        <form method="post" action="{% url 'recipes:delete_account' %}" class="delete-form">
+            {% csrf_token %}
+            <button type="submit" class="btn-delete">Delete My Account</button>
+        </form>
+    </div>
+</div>
 {% endblock %}

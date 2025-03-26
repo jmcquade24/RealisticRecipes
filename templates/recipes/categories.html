@@ -1,26 +1,20 @@
 {% extends "recipes/base.html" %}
+{% load static %}
 {% block title %}Categories Page{% endblock %}
 {% block content %}
-<h2>Categories Page</h2>
-<section>
-    <h3>Popular Recipes</h3>
-    <ul>
-        {% for recipe in popular_recipes %}
-            <li>{{ recipe.name }} - <a href="{% url 'recipes:view_recipe' recipe.slug %}">View</a></li>
+<div class="container">
+    <h2 class="page-title">All Recipe Categories</h2>
+    <div class="category-grid">
+        {% for category in categories %}
+        <div class="category-card">
+            <h3><a href="{% url 'recipes:view_category' category.id %}">{{ category.name }}</a></h3>
+            <div class="category-stats">
+                <span class="likes-count">❤️ {{ category.total_likes }} likes</span>
+            </div>
+        </div>
         {% empty %}
-            <p>No popular recipes available.</p>
+        <p class="empty-message">No categories available yet.</p>
         {% endfor %}
-    </ul>
-</section>
-<section>
-    <h3>New Recipes</h3>
-    <ul>
-        {% for recipe in new_recipes %}
-            <li>{{ recipe.name }} - <a href="{% url 'recipes:view_recipe' recipe.title %}">View</a></li>
-        {% empty %}
-            <p>No new recipes available.</p>
-        {% endfor %}
-    </ul>
-</section>
+    </div>
+</div>
 {% endblock %}
-

@@ -1,8 +1,65 @@
 {% extends "recipes/base.html" %}
-{% block title %}Profile{% endblock %}
+{% load static %}
+{% block title %}{{ profile_user.username }}'s Profile{% endblock %}
 {% block content %}
-<h2>Profile</h2>
-<p><strong>Username:</strong> {{ user.username }}</p>
-<p><strong>Email:</strong> {{ user.email }}</p>
-<a href="{% url 'recipes:manage_account' username=user.username %}">Manage Account</a>
+<div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        {% if profile_user.userprofile.profile_picture %}
+            <img src="{{ profile_user.userprofile.profile_picture.url }}" 
+                 alt="{{ profile_user.username }}" 
+                 class="profile-pic">
+        {% else %}
+            <img src="{% static 'images/default-profile.jpg' %}" 
+                 alt="Default Profile" 
+                 class="profile-pic">
+        {% endif %}
+        <div class="profile-info">
+            <h2>{{ profile_user.username }}</h2>
+            {% if profile_user.userprofile.bio %}
+                <p class="bio">{{ profile_user.userprofile.bio }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Created Recipes Section -->
+    <section class="recipes-section">
+        <h3 class="section-title">
+            <i class="fas fa-utensils"></i> My Recipes
+            <span class="count-badge">{{ created_recipes.count }}</span>
+        </h3>
+        {% if created_recipes %}
+        <div class="recipe-grid">
+            {% for recipe in created_recipes %}
+            {% include 'recipes/partials/recipe_card.html' %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-message">
+            No recipes created yet. 
+            <a href="{% url 'recipes:create_recipe' %}" class="text-link">Create your first recipe!</a>
+        </p>
+        {% endif %}
+    </section>
+
+    <!-- Favorited Recipes Section -->
+    <section class="recipes-section">
+        <h3 class="section-title">
+            <i class="fas fa-heart"></i> My Favorites
+            <span class="count-badge">{{ favorited_recipes.count }}</span>
+        </h3>
+        {% if favorited_recipes %}
+        <div class="recipe-grid">
+            {% for recipe in favorited_recipes %}
+            {% include 'recipes/partials/recipe_card.html' %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-message">
+            No favorites yet. 
+            <a href="{% url 'recipes:recipes' %}" class="text-link">Browse recipes</a> to add some!
+        </p>
+        {% endif %}
+    </section>
+</div>
 {% endblock %}
