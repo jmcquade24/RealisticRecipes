@@ -76,7 +76,7 @@ class Recipe(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        if not self.slug:  # Generate a slug if it doesn't exist
+        if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
 

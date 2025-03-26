@@ -34,7 +34,6 @@ class Command(BaseCommand):
                 password='adminpass'
             )
         
-        # Recipe data - 30+ recipes across categories
         recipes_data = [
             # Korean
             {

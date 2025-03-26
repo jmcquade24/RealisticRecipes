@@ -1,14 +1,55 @@
-{% extends 'recipes/base.html' %}
+{% extends "recipes/base.html" %}
 {% load static %}
-{% block title %}About Page{% endblock %}
+
+{% block title %}About Us - Realistic Recipes{% endblock %}
+
 {% block content %}
 <div class="about-page">
-    <h2 class="page-title">
-        <i class="fas fa-info-circle"></i> About Realistic Recipes
-    </h2>
-    
-    <div class="about-content">
-        <p class="intro">About us...</p>
-    </div>
+    <section class="about-hero">
+        <div class="hero-text">
+            <h1>Where Passion Meets Practicality</h1>
+            <p class="tagline">No chef skills required. Just real food for real people.</p>
+        </div>
+    </section>
+
+    <section class="about-section our-story">
+        <h2><span class="icon">🍳</span> Our Story</h2>
+        <p>Realistic Recipes was born from a simple truth: great food shouldn't require fancy equipment or perfect techniques. We're a community of home cooks who believe delicious meals should be:</p>
+        <ul class="beliefs">
+            <li><strong>Achievable</strong> - No 25-step recipes here!</li>
+            <li><strong>Adaptable</strong> - Swap that missing ingredient without guilt</li>
+            <li><strong>Authentic</strong> - Flavors that taste like they're made with love</li>
+        </ul>
+        <p class="signature">Founded in 2025 by team 2D</p>
+    </section>
+
+    <section class="about-section our-philosophy">
+        <h2><span class="icon">❤️</span> Our Philosophy</h2>
+        <blockquote>
+            "Cooking is love made visible"
+            <footer>- Our Grandma (and probably some philosopher)</footer>
+        </blockquote>
+        <div class="philosophy-grid">
+            <div class="philosophy-card">
+                <h3>Progress Over Perfection</h3>
+                <p>Your "good enough" dinner is our victory</p>
+            </div>
+            <div class="philosophy-card">
+                <h3>Community Wisdom</h3>
+                <p>Every recipe gets better when cooks share their tweaks</p>
+            </div>
+            <div class="philosophy-card">
+                <h3>Joyful Experimentation</h3>
+                <p>That "what if I add..." moment might create magic</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-section join-us">
+        <h2><span class="icon">🍽️</span> Join Our Table</h2>
+        <div class="cta-box">
+            <p>Bring your appetite, your substitutions, and your cooking fails - we can't wait to see what you create!</p>
+        </div>
+    </section>
 </div>
 {% endblock %}

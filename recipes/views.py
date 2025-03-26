@@ -36,7 +36,7 @@ def index(request):
         rating_count=Count('review')
     ).filter(
         rating_count__gte=3  # Only consider recipes with at least 3 ratings
-    ).order_by('-avg_rating', '-rating_count')[:3]
+    ).order_by('-avg_rating', '-rating_count')[:5]
     
     # 2. Top categories by most liked recipes in those categories
     top_categories = Category.objects.annotate(
@@ -241,7 +241,7 @@ def view_category(request, category_id):
     context = {
         "category": category,
         "recipes": recipes,
-        "can_edit_category": request.user.is_staff  # Edit permission check
+        "can_edit_category": request.user.is_staff
     }
     return render(request, "recipes/view_category.html", context)
 
