@@ -264,14 +264,7 @@ def popular_recipes(request):
     return render(request, "recipes/popular.html", {"popular": popular})
 
 def search_recipes(request):
-    query = request.GET.get("q")
-    if query:
-        recipes = Recipe.objects.filter(
-            Q(title__icontains=query) | Q(ingredients__icontains=query)
-        ).distinct()
-    else:
-        recipes = Recipe.objects.none()
-    return render(request, "search_results.html", {"recipes": recipes, "query": query})
+    return render(request, "recipes/search.html")
 
 # Custom 404 Page
 def custom_404(request, exception):

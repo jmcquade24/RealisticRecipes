@@ -7,19 +7,16 @@
 {% block content %}
 <div class="recipes-container">
 
-    <!-- Loads algoliasearch -->
-    <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.15.0/dist/algoliasearch.umd.js"></script>
-    <!-- Loads instantsearch -->
-    <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4"></script>
+    <!-- For getting url of search page to redirect to on search -->
+    <script>
+        var searchUrl = "{% url 'recipes:search' %}";
+    </script>
 
-    <div class="search-box">
-        <input id="searchbox" type="text" placeholder="Search for recipes..." />
-        <input id="search-button" type="button" value="Search" onclick="searchIndex();"/>
+    <div class="search">
+        <input class="search-box" id="searchbox" type="text" placeholder="Search for recipes..." />
+        <script src="{% static 'js/submit_search.js' %}"></script> <!-- Needs to be here, so it can reference searchbox, but before the button attatched to submitSearch() is made -->
+        <input class="btn-submit" id="search-button" type="button" value="Search" onclick="submitSearch();"/>
     </div>
-    <div id="hits"></div>
-
-    <!-- Configures search functionality -->
-    <script src="{% static 'js/search_config.js' %}"></script>
 
     {% if user.is_authenticated %}
         <form method="post" action="{% url 'recipes:create_recipe' %}">

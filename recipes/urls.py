@@ -46,7 +46,7 @@ urlpatterns = [
     
     # Popular & Search
     path("popular/", views.popular_recipes, name="popular_recipes"),
-    path("search/", views.search_recipes, name="search_recipes"),
+    path("search/", views.search_recipes, name="search"),
 
     #feedback  
     path('feedback/', views.feedback, name='feedback'),

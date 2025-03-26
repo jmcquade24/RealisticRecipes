@@ -1046,3 +1046,51 @@ blockquote footer {
         width: 100%;
     }
 }
+
+/* Styling for search results */
+.hit {
+    list-style-type: none;
+    border-color: #333;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16pt;
+    margin: 5px;
+}
+
+.hit-title {
+    font-size: 22pt;
+    text-decoration: none;
+}
+
+.ais-Hits-list {
+    background-color: #f5f0f0;
+    list-style-type: none;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 20px;
+}
+
+.hit-title:link {
+    color:#555;
+}
+
+.hit-title:visited {
+    color:#555;
+}
+
+.hit-title:hover {
+    color:#333;
+}
+
+.search-box {
+    width: fit-content;
+    height: 50px;
+    font-size: 22pt;
+}
+
+.search {
+    margin: 10px;
+    padding: 10px;
+}

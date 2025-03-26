@@ -1,19 +1,29 @@
 {% extends "recipes/base.html" %}
 {% load static %}
-
-<head>
-    {% block title %}Search{% endblock %}
+{% block title %}Search{% endblock %}
     <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4"></script>
-</head>
-    
-</head>
 
 {% block content %}
 
     <h1>Search Recipes</h1>
-    <input id="searchbox" type="text" placeholder="Search for recipes..." />
+    <!-- Loads algoliasearch -->
+    <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.15.0/dist/algoliasearch.umd.js"></script>
+    <!-- Loads instantsearch -->
+    <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4"></script>
 
+    <!-- Needs to be done here, because can't use django's relative urls in js files -->
+    <script>
+        var searchUrl = "{% url 'recipes:search' %}";
+    </script>
+
+    <div class="search">
+        <input class="search-box" id="searchbox" type="text" placeholder="Search for recipes..." />
+        <script src="{% static 'js/submit_search.js' %}"></script>
+        <input class="btn-submit" id="search-button" type="button" value="Search" onclick="submitSearch();"/>
+    </div>
     <div id="hits"></div>
+
+    <!-- Configures search functionality -->
     <script src="{% static 'js/search_config.js' %}"></script>
 
 {% endblock %}
