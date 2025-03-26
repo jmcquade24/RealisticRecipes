@@ -1,8 +1,23 @@
 {% extends "recipes/base.html" %}
 {% load static %}
 {% block title %}Recipes Page{% endblock %}
+
 {% block content %}
 <div class="recipes-page">
+    <!-- Loads algoliasearch -->
+    <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.15.0/dist/algoliasearch.umd.js"></script>
+    <!-- Loads instantsearch -->
+    <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4"></script>
+
+    <div class="search-box">
+        <input id="searchbox" type="text" placeholder="Search for recipes..." />
+        <input id="search-button" type="button" value="Search" onclick="searchIndex();"/>
+    </div>
+    <div id="hits"></div>
+
+    <!-- Configures search functionality -->
+    <script src="{% static 'js/search_config.js' %}"></script>
+    
     <h2>Recipes</h2>
     <div class="recipe-list">
         {% for recipe in recipes %}

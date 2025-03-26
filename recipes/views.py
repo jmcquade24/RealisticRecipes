@@ -16,6 +16,9 @@ from recipes.index import RecipeIndex
 from .forms import RecipeForm, UserUpdateForm, UserProfileForm, FeedbackForm, ProfilePictureForm
 from .models import Recipe, Review, Category, Like, UserProfile
 
+from django.conf import settings
+from django.http import JsonResponse
+
 # Home page
 def index(request):
     categories = Category.objects.all()
