@@ -450,39 +450,3 @@ def serialise_recipe(recipe) :
         "description": recipe.description,
         "slug": recipe.slug,
     }
-
-"""
-def search_recipes(request):
-
-    app_id = '6RFFC8176O'
-    api_key = '2c5f07a0be0b6a6f7ddfaaa263ad6474'
-    index_name = "recipes"
-
-    client = SearchClientSync(app_id, api_key)
-    record = {"objectID": "object-1", "title": "test record"}
-
-    # Add record to an index
-    save_resp = client.save_object(
-        index_name=index_name, body=record,
-    )
-
-    # Wait until indexing is done
-    client.wait_for_task(
-        index_name=index_name,
-        task_id=save_resp.task_id,
-    )
-
-    # Search for 'test'
-    results = client.search(
-    {
-        "requests": [
-            {
-                "indexName": index_name,
-                "query": "test"
-            }
-        ]
-    }
-    )
-
-    print(results.to_json())
-"""
