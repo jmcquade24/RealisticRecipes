@@ -164,7 +164,6 @@ def edit_recipe(request, slug):
     if form.is_valid():
         try:
             new_slug = slugify(recipe.title) + "-" + recipe.author.get_username()
-            print(new_slug)
             recipe.slug = new_slug
             recipe.save()
             # Add new recipe to index via proxy for searching
@@ -173,7 +172,6 @@ def edit_recipe(request, slug):
         except:
             recipe.slug = old_slug
             recipe.title = old_title
-            print(old_slug)
             return render(request, "recipes/edit_recipe.html", {"form": form, "recipe": recipe, "error": "You already have a recipe by this name"})
     return render(request, "recipes/edit_recipe.html", {"form": form, "recipe": recipe, "error":""})
 
