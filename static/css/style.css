@@ -183,6 +183,7 @@ footer {
     text-decoration: none;
     cursor: pointer;
     transition: all 0.3s ease;
+    margin-bottom: 10px;
 }
 
 .btn-view {

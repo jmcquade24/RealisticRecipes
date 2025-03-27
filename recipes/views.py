@@ -284,7 +284,7 @@ def feedback(request):
             if request.user.is_authenticated:
                 feedback.user = request.user
             feedback.save()
-            return redirect('thank_you')
+            return redirect('recipes:index')
     else:
         form = FeedbackForm()
     return render(request, 'recipes/feedback.html', {'form': form})
