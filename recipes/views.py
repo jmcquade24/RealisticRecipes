@@ -138,9 +138,7 @@ def create_recipe(request):
             recipe.save()
 
             # Add new recipe to index via proxy for searching
-            save_resp = client.save_object("recipes", serialise_recipe(recipe))
-            # Wait until indexing is done
-            client.wait_for_task(index_name="recipes", task_id=save_resp.task_id)
+            save_and_wait(recipe)
 
             return redirect("recipes:view_recipe", slug=recipe.slug)
     else:
@@ -450,3 +448,7 @@ def serialise_recipe(recipe) :
         "description": recipe.description,
         "slug": recipe.slug,
     }
+
+async def save_and_wait(recipe):
+            response = await client.save_object("recipes", serialise_recipe(recipe))
+            await client.wait_for_task(index_name="recipes", task_id=response["taskID"])
