@@ -15,6 +15,7 @@ from django.core.paginator import Paginator
 from django.core.cache import cache
 from django.views.generic import CreateView, UpdateView
 from django.contrib import messages
+from django.utils.text import slugify
 
 from algoliasearch_django import register
 from algoliasearch_django import save_record
@@ -136,6 +137,7 @@ def create_recipe(request):
             try:
                 recipe = form.save(commit=False)
                 recipe.author = request.user
+                # Exception occurs on recipe.save()
                 recipe.save()
                 # Add new recipe to index via proxy for searching
                 save_and_wait(recipe)
@@ -158,9 +160,16 @@ def edit_recipe(request, slug):
         return redirect('recipes:view_recipe', slug=slug)
     form = RecipeForm(request.POST or None, request.FILES or None, instance=recipe)
     if form.is_valid():
-        form.save()
-        return redirect("recipes:view_recipe", slug=recipe.slug)
-    return render(request, "recipes/edit_recipe.html", {"form": form, "recipe": recipe})
+        try:
+            new_slug = slugify(recipe.title) + "-" + recipe.author.get_username()
+            recipe.slug = new_slug
+            recipe.save()
+            # Add new recipe to index via proxy for searching
+            save_and_wait(recipe)
+            return redirect("recipes:view_recipe", slug=recipe.slug)
+        except:
+            return render(request, "recipes/edit_recipe.html", {"form": form, "recipe": recipe, "error": "You already have a recipe by this name"})
+    return render(request, "recipes/edit_recipe.html", {"form": form, "recipe": recipe, "error":""})
 
 @login_required
 def delete_recipe(request, slug):
