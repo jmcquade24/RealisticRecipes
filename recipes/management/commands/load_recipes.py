@@ -259,8 +259,10 @@ class Command(BaseCommand):
             }
         
         async def save_and_wait(recipe):
-            response = await client.save_object("recipes", serialise_recipe(recipe))
-            await client.wait_for_task(index_name="recipes", task_id=response["taskID"])
+            check_if_present = client.search("search_query", {"filters": f"title:'{recipe.title}'"})
+            if check_if_present["nbHits"] == 0:
+                response = await client.save_object("recipes", serialise_recipe(recipe))
+                await client.wait_for_task(index_name="recipes", task_id=response["taskID"])
 
         # Create recipes
         for recipe_data in recipes_data:

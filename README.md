@@ -1,7 +1,5 @@
 # RealisticRecipes
-recipe website
+Recipe website
 
-Requirements:
-- Python version - 3.11
-- Django version - 2.2.28
-- Pillow
+- All requirements found in requirements.txt
+- Sample data can be loaded in by running "$python manage.py load_recipes" on your local machine
