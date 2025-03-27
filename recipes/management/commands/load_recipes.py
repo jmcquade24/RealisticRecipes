@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from recipes.models import Recipe, Category
 from algolia_search.algolia_config import client
 from RealisticRecipes import settings
+from django.utils.text import slugify
 
 class Command(BaseCommand):
     help = 'Loads 30+ demo recipes with categories'
@@ -267,6 +268,7 @@ class Command(BaseCommand):
                 **recipe_data,
                 author=admin_user
             )
+            recipe.slug = slugify(recipe.title) + "-" + recipe.author.get_username()
             save_and_wait(recipe)
             
         

@@ -133,17 +133,18 @@ def create_recipe(request):
     if request.method == "POST":
         form = RecipeForm(request.POST, request.FILES)
         if form.is_valid():
-            recipe = form.save(commit=False)
-            recipe.author = request.user
-            recipe.save()
-
-            # Add new recipe to index via proxy for searching
-            save_and_wait(recipe)
-
-            return redirect("recipes:view_recipe", slug=recipe.slug)
+            try:
+                recipe = form.save(commit=False)
+                recipe.author = request.user
+                recipe.save()
+                # Add new recipe to index via proxy for searching
+                save_and_wait(recipe)
+                return redirect("recipes:view_recipe", slug=recipe.slug)
+            except:
+                return render(request, "recipes/create_recipe.html", {"form": form, "error": "You already have a recipe by this name"})
     else:
         form = RecipeForm()
-    return render(request, "recipes/create_recipe.html", {"form": form})
+    return render(request, "recipes/create_recipe.html", {"form": form, "error": ""})
 
 def view_recipe(request, slug):
     recipe = get_object_or_404(Recipe.objects.select_related('author'), slug=slug)

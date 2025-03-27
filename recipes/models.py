@@ -70,14 +70,14 @@ class Recipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     likes = models.ManyToManyField(User, related_name="liked_recipes", blank=True)
     favorites = models.ManyToManyField(User, related_name="favorited_recipes", blank=True)
-    slug = models.SlugField(unique=False, blank=True)
+    slug = models.SlugField(unique=True, blank=True)
 
     def __str__(self):
         return self.title
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            self.slug = slugify(self.title) + "-" + self.author.get_username()
         super().save(*args, **kwargs)
 
 
