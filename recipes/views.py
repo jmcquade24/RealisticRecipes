@@ -155,6 +155,7 @@ def view_recipe(request, slug):
 
 @login_required
 def edit_recipe(request, slug):
+    old_slug = slug
     recipe = get_object_or_404(Recipe, slug=slug)
     if request.user != recipe.author:
         return redirect('recipes:view_recipe', slug=slug)
@@ -168,6 +169,7 @@ def edit_recipe(request, slug):
             save_and_wait(recipe)
             return redirect("recipes:view_recipe", slug=recipe.slug)
         except:
+            recipe.slug = old_slug
             return render(request, "recipes/edit_recipe.html", {"form": form, "recipe": recipe, "error": "You already have a recipe by this name"})
     return render(request, "recipes/edit_recipe.html", {"form": form, "recipe": recipe, "error":""})
 
