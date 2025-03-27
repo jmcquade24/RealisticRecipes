@@ -18,8 +18,10 @@ from django.contrib import messages
 
 from algoliasearch_django import register
 from algoliasearch_django import save_record
+from algoliasearch.search.client import SearchClientSync
 from recipes.models import Recipe
 from recipes.index import RecipeIndex
+from algolia_search.algolia_config import client
 
 from .forms import RecipeForm, UserUpdateForm, UserProfileForm, FeedbackForm, ProfilePictureForm, CategoryForm, CategoryApprovalForm
 from .models import Recipe, Review, Category, Like, UserProfile
@@ -134,7 +136,12 @@ def create_recipe(request):
             recipe = form.save(commit=False)
             recipe.author = request.user
             recipe.save()
-            save_record(recipe)
+
+            # Add new recipe to index via proxy for searching
+            save_resp = client.save_object("recipes", serialise_recipe(recipe))
+            # Wait until indexing is done
+            client.wait_for_task(index_name="recipes", task_id=save_resp.task_id)
+
             return redirect("recipes:view_recipe", slug=recipe.slug)
     else:
         form = RecipeForm()
@@ -431,3 +438,51 @@ def approve_category(request, pk):
         'form': form,
         'category': category
     })
+
+#  ------------------
+# | Helper functions |
+#  ------------------
+
+def serialise_recipe(recipe) :
+    return {
+        "objectID": recipe.slug,  # Algolia requires a unique identifier
+        "title": recipe.title,
+        "description": recipe.description,
+        "slug": recipe.slug,
+    }
+
+"""
+def search_recipes(request):
+
+    app_id = '6RFFC8176O'
+    api_key = '2c5f07a0be0b6a6f7ddfaaa263ad6474'
+    index_name = "recipes"
+
+    client = SearchClientSync(app_id, api_key)
+    record = {"objectID": "object-1", "title": "test record"}
+
+    # Add record to an index
+    save_resp = client.save_object(
+        index_name=index_name, body=record,
+    )
+
+    # Wait until indexing is done
+    client.wait_for_task(
+        index_name=index_name,
+        task_id=save_resp.task_id,
+    )
+
+    # Search for 'test'
+    results = client.search(
+    {
+        "requests": [
+            {
+                "indexName": index_name,
+                "query": "test"
+            }
+        ]
+    }
+    )
+
+    print(results.to_json())
+"""

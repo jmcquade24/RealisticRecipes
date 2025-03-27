@@ -1,11 +1,14 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from recipes.models import Recipe, Category
+from algolia_search.algolia_config import client
+from RealisticRecipes import settings
 
 class Command(BaseCommand):
     help = 'Loads 30+ demo recipes with categories'
-    
+
     def handle(self, *args, **options):
+
         # Create categories if they don't exist
         categories = {
             "Korean": self.get_or_create_category("Korean"),
@@ -245,13 +248,27 @@ class Command(BaseCommand):
                 "category": categories["Desserts"]
             }
         ]
+
+        def serialise_recipe(recipe):
+            return {
+            "objectID": recipe.slug,
+            "title": recipe.title,
+            "description": recipe.description,
+            "slug": recipe.slug,
+            }
         
+        async def save_and_wait(recipe):
+            response = await client.save_object("recipes", serialise_recipe(recipe))
+            await client.wait_for_task(index_name="recipes", task_id=response["taskID"])
+
         # Create recipes
         for recipe_data in recipes_data:
-            Recipe.objects.create(
+            recipe = Recipe.objects.create(
                 **recipe_data,
                 author=admin_user
             )
+            save_and_wait(recipe)
+            
         
         self.stdout.write(self.style.SUCCESS(f'Successfully created {len(recipes_data)} recipes across {len(categories)} categories!'))
 
@@ -260,3 +277,5 @@ class Command(BaseCommand):
         if created:
             self.stdout.write(f'Created category: {name}')
         return category
+    
+    
